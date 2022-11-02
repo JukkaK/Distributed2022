@@ -29,3 +29,7 @@ Initial choices:
 [Javascript Service Bus samples](https://learn.microsoft.com/en-us/samples/azure/azure-sdk-for-js/service-bus-javascript/)<br>
 [Azure Storage File Share javascript library](https://learn.microsoft.com/en-us/javascript/api/overview/azure/storage-file-share-readme?view=azure-node-latest)<br>
 [Azure Static Web Apps with node.js](https://learn.microsoft.com/en-us/azure/developer/javascript/how-to/create-static-web-app)<br>
+
+## MS Learn Modules
+
+[Developer](https://learn.microsoft.com/en-us/certifications/exams/az-204)<br>

@@ -4,9 +4,9 @@
 name: Build and deploy Node.js project to Azure Function App - func-distributed-we-001
 
 on:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   workflow_dispatch:
 
 env:

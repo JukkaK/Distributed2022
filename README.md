@@ -3,6 +3,11 @@
 
 Some basic info about the project (insert here).
 
+## Members (with knowledge areas listed)
+
+- Jukka (Azure, Architecture, DevOpsy-stuff - not really a programmer as such, but I'll learn whatever the other choose to implement with)
+- Jari (node.js)
+
 ## Technology
 
 Initial choices:

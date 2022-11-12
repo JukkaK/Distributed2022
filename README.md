@@ -22,10 +22,12 @@ Initial choices:
 * Javascript/nodejs for implementation.
 * Application Insights for logging
 
-### Service Bus vs Event Grid?
+### Service Bus and Event Grid
 
 [Event Grid vs Event Hub vs Service Bus](https://learn.microsoft.com/en-us/azure/event-grid/compare-messaging-services)<br>
-
+[Service Bus queues and topics](https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-queues-topics-subscriptions)<br>
+[Event Grid custom topics](https://learn.microsoft.com/en-us/azure/event-grid/custom-topics)<br>
+[Azure Function as event handler](https://learn.microsoft.com/en-us/azure/event-grid/handler-functions)
 ## Documentation for Azure Services
 
 [Azure Function docs](https://learn.microsoft.com/en-us/azure/azure-functions/)<br>
@@ -33,6 +35,7 @@ Initial choices:
 [Azure Files](https://learn.microsoft.com/en-us/azure/storage/files/)<br>
 [Azure Static Web Apps](https://learn.microsoft.com/en-us/azure/static-web-apps/)<br>
 [Azure Event Grid](https://learn.microsoft.com/en-us/azure/event-grid/)
+[MongoDB API for Cosmos DB](https://learn.microsoft.com/en-us/azure/cosmos-db/mongodb/introduction)
 
 ## Implementation examples
 

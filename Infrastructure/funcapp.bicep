@@ -76,7 +76,7 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
         }
         {
           name: 'WEBSITE_NODE_DEFAULT_VERSION'
-          value: '~10'
+          value: '~14'
         }
         {
           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
@@ -86,9 +86,30 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
           name: 'FUNCTIONS_WORKER_RUNTIME'
           value: functionWorkerRuntime
         }
+        // {
+        //   name: 'CosmosConnectionString'
+        //   value: cosmoscs
+        // }
         {
-          name: 'CosmosConnectionString'
-          value: cosmoscs
+          name: 'COSMOSDB_HOST'
+          value: 'mongodb-aluwohbosnxec.mongo.cosmos.azure.com'
+        }
+        {
+          name: 'COSMOSDB_PORT'
+          value: '10255'
+        }
+        {
+          name: 'COSMOSDB_DBNAME'
+          value: 'mongodb-aluwohbosnxec'
+        }
+        {
+          name: 'COSMOSDB_USER'
+          value: 'mongodb-aluwohbosnxec'
+        }
+        //Never do this in real life
+        {
+          name: 'COSMOSDB_PASSWORD'
+          value: 'RCfdzUSCQFC5HzIznndvps0p7SO4H0rAHr6gb1FPr4xv96lnkCzDEwTvgwvDob7kvWAsq5C1Fm3uACDbahRjgA=='
         }
       ]
       ftpsState: 'FtpsOnly'

@@ -1,5 +1,5 @@
 import './Product.css'
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 const Product = ({ product, makeOrder }) => {
   const [newOrder, setNewOrder] = useState(0)
@@ -9,11 +9,7 @@ const Product = ({ product, makeOrder }) => {
     makeOrder(event, product.ean, newOrder)
     setNewOrder(0)
   }
-/*
-  const handleOrderChange = (event) => {
-    setNewOrder(event.target.value)
-  }
-*/
+
   return (
     <div className="product-wrapper">
       <div className='product'>
@@ -36,12 +32,5 @@ const Product = ({ product, makeOrder }) => {
     </div>
   )
 }
-/*
-<input
-value={newOrder}
-onChange={handleOrderChange}
-pattern="^-?[1-9]\d*\.?\d*$"
-/>
-*/
 
 export default Product

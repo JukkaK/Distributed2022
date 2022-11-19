@@ -1,23 +1,23 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Product from './components/Product'
-import productService from './services/products'
+import { getAllProducts, editAmount } from './services/products'
 import './App.css'
 
 const App = () => {
   const order = [
     {
       "ean": 1111,
-      "name": "product one",
+      "name": "gift one",
       "amount": 0
     },
     {
       "ean": 2222,
-      "name": "product two",
+      "name": "gift two",
       "amount": 0
     },
     {
       "ean": 3333,
-      "name": "product three",
+      "name": "gift three",
       "amount": 0
     }
   ]
@@ -25,7 +25,7 @@ const App = () => {
   const [products, setProducts] = useState([])
   const [cart, setCart] = useState(order)
 
-
+  console.log(getAllProducts())
   useEffect(() => {
     updateProducts()
 
@@ -37,9 +37,7 @@ const App = () => {
   }, [])
 
   const updateProducts = () => {
-    console.log('updating products')
-    productService
-    .getAll()
+    getAllProducts()
     .then(initialProducts => {
       setProducts(initialProducts)
     })
@@ -59,23 +57,29 @@ const App = () => {
   
   const placeOrder = (event) => {
     updateProducts()
+    //create the shoppingList
     const shoppingList = event.filter(item => item.amount !== 0)
-    console.log(shoppingList)
 
-    const isItOut = shoppingList.filter(item => {
+    //check availability
+    shoppingList.filter(item => {
       const vastaava = products.find(e => e.ean === item.ean)
       if (item.amount > vastaava.amount) {
-        return alert(`So sorry, but we are out of ${item.name}. Please remove the item from the shopping cart`);
+        shoppingList.splice(shoppingList.findIndex(e => e.ean === item.ean),1);
+        return alert(`So sorry, we have item ${item.name} only ${vastaava.amount}. Item will be removed`);
       }
-      return console.log('check done')
+      return console.log("we have it")
     })
 
-    console.log(isItOut)
-
-    // jos tavaraa riittävästi shoppingList lähetetään tässä kohden palvelimelle
-
+    //place the order to backend and empty the cart
+    shoppingList.map(product => purchase(product))
     updateProducts()
     setCart(order);
+    }
+
+  const purchase = (product) => {
+    editAmount(product).then(response => {
+      console.log("reply", response)
+    })
   }
 
   const removeItem = (event) => {
@@ -92,7 +96,7 @@ const App = () => {
   return (
     <div className='container'>
       <div className='title'>
-        <h1>Coffee world</h1>
+        <h1>Gift shop</h1>
       </div>      
       <ul>
         {products.map(product => 

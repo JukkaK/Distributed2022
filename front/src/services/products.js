@@ -1,17 +1,15 @@
-import axios from 'axios'
-const baseUrl = '/products'
+export async function getAllProducts() {
 
-const getAll = () => {
-  const request = axios.get(baseUrl)
-
-  return request.then(response => response.data)
+  const response = await fetch('/api/todos');
+  return await response.json();
 }
 
-const update = (id, newObject) => {
-  console.log(newObject)
-  const request = axios.put(`${baseUrl}/${id}`, newObject)
-  return request.then(response => response.data)
+export async function editAmount(data) {
+  console.log(data)
+  const response = await fetch(`/api/todo`, {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({task: data})
+  })
+  return await response.json();
 }
-
-// eslint-disable-next-line import/no-anonymous-default-export
-export default { getAll, update }

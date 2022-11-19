@@ -14,21 +14,19 @@ The aim of this project is to create a simple webshop, where the worker nodes up
 
 The webshop we are building has several architectural layers:
 
-- Frontend, a single page app made with React.js and hosted in Azure Static WebApps.
-- A messaging layer that frontend calls, which distributes frontend messages for the worker nodes. Azure Event Grid is used as messaging service.
+- Frontend, a single page app made with React.js and backend functions, hosted in Azure Static WebApps.
+- A messaging layer that frontend calls, which distributes frontend messages for the worker nodes. It also distributes events from worker nodes to other worker nodes. Azure Event Grid is used as messaging service. 
 - Backend layer that consists of the geographically distributed worker nodes hosted in Azure Serverless Functions.
-- Data layer emulating a warehouse. Data will be stored in an nosql-database, possibly MongoDB. While the aim of the project is not to use a separate data storage for each of the nodes, using MongoDB API of Azure CosmosDB would make this possible. 
-- Logging is handled by Application Insights, where are the functions will be connected.
+- Data layer emulating a warehouse. Data will be stored in an nosql-database and worker nodes use a simple DB API to fetch and update data from DB. The database will also host separate data stores for each worker node, where they store their individual state of events completed by all nodes.
+- Logging is handled by Application Insights, where all the functions will be connected.
 
 ## Nodes
 
 Worker nodes are responsible for querying and updating data in warehouse database, and simulate a high-availability scenario where the nodes have been deployed to different geographic regions in Azure cloud. They subscribe to Event Grid Topics where messages from Frontend are pushed into, consume messages with HTTP trigger functions that execute a specific task.
 
-As we are dealing with a high-availability scenario and services in different Azure regions are notoriously wobbly (not really, but we can simulate this by turning off functions), we also need to implement fault tolerance to the nodes. Event Grid does not care what happens to a message after it's consumed, so the worker nodes must each keep note what was the last message it consumed and wheter that execution was succesfully completed. If not, it needs to consume the message again. 
+As we are dealing with a high-availability scenario and services in different Azure regions are notoriously wobbly (not really, but we can simulate this by turning off functions), we also need to implement fault tolerance to the nodes. Event Grid does not care what happens to a message after it's consumed, so the worker nodes must each keep note what was the last message it consumed and wheter that execution was succesfully completed. If not, it needs to consume the message again. This is also implemented via the Event grid Topics; each node push notifications on succesfull transactions to Event Grid, where other nodes consume the notifications and store them locally (though we probably implement these local states as just separate collections in the shared database).
 
 ## Messages
-
-**TODO: Messages need to be defined, these are just examples with no real thought put into them.**
 
 The frontend implements three different API calls: GET all the items and their current quantities, GET the current quantity of a certain item, and UPDATE the quantity of a certain item.
 
@@ -37,13 +35,18 @@ Azure Event Grid [Event schema](https://learn.microsoft.com/en-us/azure/event-gr
 ```
 [{
   "id": "1807",
-  "eventType": "recordInserted",
-  "subject": "myapp/vehicles/motorcycles",
+  "eventType": "recordUpdated",
+  "subject": "warehouse/products/orange",
   "eventTime": "2017-08-10T21:03:07+00:00",
   "data": {
-    "ean": "1234567",
-    "name": "Suristin",
-    "amount": "100"
+    "products": [
+      {
+        "id": 1,
+        "ean": 1111,
+        "name": "Orange",
+        "saldo": 5
+      }
+    ]
   },
   "dataVersion": "1.0",
   "metadataVersion": "1",
@@ -53,33 +56,75 @@ Azure Event Grid [Event schema](https://learn.microsoft.com/en-us/azure/event-gr
 
 Where _data_ element describes the actual payload of the event message.
 
+An event sent by the worker node completing the previous event would be:
+
+```
+[{
+  "id": "1808",
+  "eventType": "transactionCompleted",
+  "subject": "webapp/workers/transactions",
+  "eventTime": "2017-08-10T21:03:08+00:00",
+  "data": {
+    "transaction": "1807",
+    "status": "completed",
+    "timestamp": "2017-08-10T21:03:07+00:00"
+  },
+  "dataVersion": "1.0"
+}]
+```
+
 ## Some Architectural choices
 
 ![Architecture sketch](./architecture.drawio.png)
 
 ### Frontend
 
-Frontend is hosted in Static Web Apps, which actually offers hosting of two different services: the single page app and and backend functions (which are just Azure Functions). In this case, it is probably easier to create the bindings for Event Grid in the function code than it is in the SPA.
+Frontend is hosted in Static Web Apps, which actually offers hosting of two different services: the single page app and and backend functions (which are just Azure Functions deployed into the Static Web App resource). In this case, it is easier to create the bindings for Event Grid in the function code than it is in the SPA.
+
+[Azure Static Web Apps Overview](https://learn.microsoft.com/en-us/azure/static-web-apps/overview)
+
+Plan B for frontend is to implement direct Event Grid bindings to SPA.
 
 ### Messaging
 
-Azure offers two separate messaging services that could be used to distribute messages to worker nodes: *Event Grid* and *Service Bus*. Event Grid is the simpler of the two as it is meant only to distribute events that other services react to, and it does not really care who reacts or acts on the messages. Service Bus, on the other hand, would be used in a real high availability scenario. Service Bus handles a lot of the fault tolerance issues in distributed application, so the question for the project is wheter it actually does too much. With Event Grid, a lot of the fault tolerance logic is left for the rest of the implementation.
+Azure offers two separate messaging services that could be used to distribute messages to worker nodes: *Event Grid* and *Service Bus*. Event Grid is the simpler of the two as it is meant only to distribute events that other services react to, and it does not really care who reacts or acts on the messages. Service Bus, on the other hand, would be used in a real high availability scenario.
+
+For this project, we chose Event Grid as messaging middleware, as we want to implement both messaging between frontend and database (via the backend nodes) and messaging between nodes through the same middleware. 
+
+[Event Grid vs Event Hub vs Service Bus](https://learn.microsoft.com/en-us/azure/event-grid/compare-messaging-services)<br>
+[Azure Event Grid](https://learn.microsoft.com/en-us/azure/event-grid/)<br>
+
+Plan B for messaging layer is to implement Service Bus queues for same use cases.
 
 ### Worker nodes
 
-The main question for implementing the worker nodes is wheter they should be implemented as functions or full node.js apps hosted in Azure App Services. Functions come in two varieties; the serverless (and stateless) ones and durable functions that can store their state. 
+Worker nodes are implemented as serverless Azure Functions, which are stateless (unless we really really need stateful functions). Functions subscribe to Event Grid topics, and are triggered by incoming events. While the functions are stateless in technical sense, they do store every event they complete in their own database collection. We then either implement a logic for re-trying to execute an event which was consumed, but not succesfully executed, or a logic where every worker checks if an event was already executed by another node, before executing it by themselves.
+
+Note: This will probably lead all kinds of interesting synchronization issues, but solving those is probably the meat of this exercise anyway. If solving these becomes too hard, we can always utilize plan B and use Service Bus.
+
+__Requirement mapping for nodes__
+
+* Running on a separate computer / virtual machine: We create each function as it's own resource and deploy them to separate Azure Regions.
+* have its own IP-address: See [naming and node discovery](#naming-and-node-discovery) below.
+* communicate with at least two other nodes only by using Internet protocol based message: At least 3 nodes that communicate via events (see [event schema](#messages) above)
+exchange
+* be able to express their state and/or readiness for sessions towards other nodes: Publishing and subscribing to events on which node has completed which frontend event should be sufficent for this.
+
+Plan B for worker nodes is to implement them as full nodejs applications running in Azure App Service (each with it's own App Service Plan or web server, as they are deployed to different regions).
 
 ### Data layer
 
-Main questions with data layer are wheter it provides rich enough API for the functions to use out-of-the-box, or if we need to implement a simple api for storing and reading the data. Using a distributed data layer is an advanced topic that can be explored if time permits (then the obvious choice is to use Azure CosmosDB and distribute it to same geographic locations where worker nodes are, and play with the [consistency levels](https://learn.microsoft.com/en-us/azure/cosmos-db/consistency-levels)).
+Data layer is implemented as Azure Cosmos DB database with MongoDB API, and a simple DB Api service implemented in Azure Function. Cosmos DB would permit us using a distributed data layer, but that is an advanced topic that can be explored if time permits (then the obvious choice is to use Azure CosmosDB and distribute it to same geographic locations where worker nodes are, and play with the [consistency levels](https://learn.microsoft.com/en-us/azure/cosmos-db/consistency-levels)).
+
+Plan B for data layer is some simpler Azure-hosted nosql database.
 
 ## Required Functionalities
 
 ### Shared Distributed State
 
-This should be implemented in the worker nodes and in it's simplest form it would be logging of the events received and executed by the worker, which could then be used for re-consuming an event that was not succesfully executed. The state needs to be stored somewhere, and the easiest option would be just to store the state in database.  If we use Service Bus, there really is no need to keep a log of the consumed messages, as the service itself can handle the timeouts and re-tries (we could of course opt not to use those features). 
+This is implemented in the worker nodes and in it's simplest it is logging of the events received (from frontend) and executed by the worker, which could then be used for re-consuming an event that was not succesfully executed. The state needs to be stored somewhere, and the easiest option would be just to store the state in database.  
 
-One option would be to implement a pattern, where every consumed message is stored into an Azure Storage Account by the function reading the events/queue, and another function would consume the event/message and perform the actual action against the database. But this feels like too complicated approach for this kind of simple scenario.
+One option would be to implement a pattern, where every consumed message is stored into an Azure Storage Account by the function reading the events/queue, and another function would consume the event/message and perform the actual action against the database. But this feels like too complicated approach for this project.
 
 ### Naming and Node discovery
 
@@ -91,13 +136,15 @@ Third option would be to create a public or private DNS zone and create DNS reco
 
 ### Synchronization and consistency
 
-Implementing this requirement is tied to how we want to handle the messaging layer - if we use Service Bus, both aspect a to some degree taken care by the messaging layer, that can be used to dictate that a message has to be consumed at least one, and only once. With Event Grid (or some kind of custom messaging solution) we would need to implement more of this logic to the worker nodes.
+Using Event Grid as messaging layer requires us to implement these in some form (using Service Bus would probably solve them for us), so we need to implement an Event Grid Topic through which nodes communicate which frontend events they have completed.
 
 Consistency could be implemented by distributing the data layer as described in the [Data Layer](#data-layer) above. Using an eventual consistency mode of Cosmos DB would probably lead to implementing all kinds of interesting synchronization things into the worker nodes, as the database shards in different geograpchies might hold an entirely different opinion of what amount of which item is available at any given time (not a really realistic scenario, but whatever).
 
 ### Fault Tolerance
 
-Same as above; with Service Bus, a lot of the fault tolerance issues are handled by the messaging service. 
+Same as above; with Service Bus, a lot of the fault tolerance issues are handled by the messaging service. With Event Grid we need to implement node-to-node communication. So our fault tolerance approach is to ensure that every event is executed at least once by implementing a re-execution if no node has a succesful execution of a certain event in their local state.
+
+We deploy the worker node to different Azure regions, which gives us some fault tolerance in the technical sense (Azure Regions usually have three separate datacenters, so our nodes are covered for major outages, which should be enough for this project - no need to go full High Availability here, we hope).
 
 ### Consensus
 

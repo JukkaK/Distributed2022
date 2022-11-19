@@ -15,10 +15,10 @@ The aim of this project is to create a simple webshop, where the worker nodes up
 The webshop we are building has several architectural layers:
 
 - Frontend, a single page app made with React.js and backend functions, hosted in Azure Static WebApps.
-- A messaging layer that frontend calls, which distributes frontend messages for the worker nodes. Azure Event Grid is used as messaging service.
+- A messaging layer that frontend calls, which distributes frontend messages for the worker nodes. It also distributes events from worker nodes to other worker nodes. Azure Event Grid is used as messaging service. 
 - Backend layer that consists of the geographically distributed worker nodes hosted in Azure Serverless Functions.
-- Data layer emulating a warehouse. Data will be stored in an nosql-database, possibly MongoDB. While the aim of the project is not to use a separate data storage for each of the nodes, using MongoDB API of Azure CosmosDB would make this possible. 
-- Logging is handled by Application Insights, where are the functions will be connected.
+- Data layer emulating a warehouse. Data will be stored in an nosql-database and worker nodes use a simple DB API to fetch and update data from DB. The database will also host separate data stores for each worker node, where they store their individual state of events completed by all nodes.
+- Logging is handled by Application Insights, where all the functions will be connected.
 
 ## Nodes
 
@@ -28,8 +28,6 @@ As we are dealing with a high-availability scenario and services in different Az
 
 ## Messages
 
-**TODO: Add message schematincs from frontend implementation.**
-
 The frontend implements three different API calls: GET all the items and their current quantities, GET the current quantity of a certain item, and UPDATE the quantity of a certain item.
 
 Azure Event Grid [Event schema](https://learn.microsoft.com/en-us/azure/event-grid/event-schema#event-schema) describes the full event schema and an example of custom event we are using would be:
@@ -37,30 +35,15 @@ Azure Event Grid [Event schema](https://learn.microsoft.com/en-us/azure/event-gr
 ```
 [{
   "id": "1807",
-  "eventType": "recordInserted",
-  "subject": "myapp/vehicles/motorcycles",
+  "eventType": "recordUpdated",
+  "subject": "warehouse/products/orange",
   "eventTime": "2017-08-10T21:03:07+00:00",
   "data": {
     "products": [
       {
         "id": 1,
         "ean": 1111,
-        "pic": "HTML is easy",
-        "name": "product one",
-        "saldo": 5
-      },
-      {
-        "id": 2,
-        "ean": 2222,
-        "pic": "HTML is easy",
-        "name": "product two",
-        "saldo": 5
-      },
-      {
-        "id": 2,
-        "ean": 3333,
-        "pic": "HTML is easy",
-        "name": "product three",
+        "name": "Orange",
         "saldo": 5
       }
     ]
@@ -73,15 +56,34 @@ Azure Event Grid [Event schema](https://learn.microsoft.com/en-us/azure/event-gr
 
 Where _data_ element describes the actual payload of the event message.
 
+An event sent by the worker node completing the previous event would be:
+
+```
+[{
+  "id": "1808",
+  "eventType": "transactionCompleted",
+  "subject": "webapp/workers/transactions",
+  "eventTime": "2017-08-10T21:03:08+00:00",
+  "data": {
+    "transaction": "1807",
+    "status": "completed",
+    "timestamp": "2017-08-10T21:03:07+00:00"
+  },
+  "dataVersion": "1.0"
+}]
+```
+
 ## Some Architectural choices
 
 ![Architecture sketch](./architecture.drawio.png)
 
 ### Frontend
 
-Frontend is hosted in Static Web Apps, which actually offers hosting of two different services: the single page app and and backend functions (which are just Azure Functions deployed into the Static Web App resource). In this case, it is probably easier to create the bindings for Event Grid in the function code than it is in the SPA.
+Frontend is hosted in Static Web Apps, which actually offers hosting of two different services: the single page app and and backend functions (which are just Azure Functions deployed into the Static Web App resource). In this case, it is easier to create the bindings for Event Grid in the function code than it is in the SPA.
 
 [Azure Static Web Apps Overview](https://learn.microsoft.com/en-us/azure/static-web-apps/overview)
+
+Plan B for frontend is to implement direct Event Grid bindings to SPA.
 
 ### Messaging
 
@@ -91,6 +93,9 @@ For this project, we chose Event Grid as messaging middleware, as we want to imp
 
 [Event Grid vs Event Hub vs Service Bus](https://learn.microsoft.com/en-us/azure/event-grid/compare-messaging-services)<br>
 [Azure Event Grid](https://learn.microsoft.com/en-us/azure/event-grid/)<br>
+
+Plan B for messaging layer is to implement Service Bus queues for same use cases.
+
 ### Worker nodes
 
 Worker nodes are implemented as serverless Azure Functions, which are stateless (unless we really really need stateful functions). Functions subscribe to Event Grid topics, and are triggered by incoming events. While the functions are stateless in technical sense, they do store every event they complete in their own database collection. We then either implement a logic for re-trying to execute an event which was consumed, but not succesfully executed, or a logic where every worker checks if an event was already executed by another node, before executing it by themselves.
@@ -105,9 +110,13 @@ __Requirement mapping for nodes__
 exchange
 * be able to express their state and/or readiness for sessions towards other nodes: Publishing and subscribing to events on which node has completed which frontend event should be sufficent for this.
 
+Plan B for worker nodes is to implement them as full nodejs applications running in Azure App Service (each with it's own App Service Plan or web server, as they are deployed to different regions).
+
 ### Data layer
 
-Main questions with data layer are wheter it provides rich enough API for the functions to use out-of-the-box, or if we need to implement a simple api for storing and reading the data. Using a distributed data layer is an advanced topic that can be explored if time permits (then the obvious choice is to use Azure CosmosDB and distribute it to same geographic locations where worker nodes are, and play with the [consistency levels](https://learn.microsoft.com/en-us/azure/cosmos-db/consistency-levels)).
+Data layer is implemented as Azure Cosmos DB database with MongoDB API, and a simple DB Api service implemented in Azure Function. Cosmos DB would permit us using a distributed data layer, but that is an advanced topic that can be explored if time permits (then the obvious choice is to use Azure CosmosDB and distribute it to same geographic locations where worker nodes are, and play with the [consistency levels](https://learn.microsoft.com/en-us/azure/cosmos-db/consistency-levels)).
+
+Plan B for data layer is some simpler Azure-hosted nosql database.
 
 ## Required Functionalities
 

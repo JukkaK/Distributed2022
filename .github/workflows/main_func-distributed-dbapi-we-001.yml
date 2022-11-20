@@ -12,7 +12,7 @@ env:
 
 defaults:
   run:    
-    working-directory: dbapi
+    working-directory: dbApi
 
 jobs:
   build-and-deploy:

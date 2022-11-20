@@ -10,10 +10,6 @@ env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
   NODE_VERSION: '14.x' # set this to the node version to use (supports 8.x, 10.x, 12.x)
 
-defaults:
-  run:    
-    working-directory: dbApi
-
 jobs:
   build-and-deploy:
     runs-on: windows-latest
@@ -28,6 +24,7 @@ jobs:
 
       - name: 'Resolve Project Dependencies Using Npm'
         shell: pwsh
+        working-directory: dbApi
         run: |
           pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
           npm install
@@ -37,9 +34,10 @@ jobs:
 
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
-        id: fa
+        id: fa        
         with:
           app-name: 'func-distributed-dbapi-we-001'
           slot-name: 'Production'
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_320A1595B5A843FE93FA3173A73D34C7 }}
+          working-directory: dbApi

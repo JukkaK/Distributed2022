@@ -1,16 +1,25 @@
 {
-  "notes": [
+  "products": [
     {
       "id": 1,
-      "content": "HTML is easy"
+      "ean": 1111,
+      "pic": "coffee.png",
+      "name": "product one",
+      "amount": 25
     },
     {
       "id": 2,
-      "content": "Browser can execute only JavaScript"
+      "ean": 2222,
+      "pic": "coffee2.png",
+      "name": "coffee two",
+      "amount": 10
     },
     {
       "id": 3,
-      "content": "GET and POST are the most important methods of HTTP protocol"
+      "ean": 3333,
+      "pic": "coffee3.png",
+      "name": "coffee three",
+      "amount": 0
     }
   ]
 }

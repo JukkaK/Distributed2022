@@ -9,9 +9,11 @@
       "route": "todo"
     },
     {
-      "type": "http",
-      "direction": "out",
-      "name": "res"
-    }
+      "type": "eventGrid",
+      "name": "outputEvent",
+      "topicEndpointUri": "MyEventGridTopicUriSetting",
+      "topicKeySetting": "MyEventGridTopicKeySetting",
+      "direction": "out"
+  }
   ]
 }

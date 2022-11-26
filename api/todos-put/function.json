@@ -11,8 +11,6 @@
     {
       "type": "eventGrid",
       "name": "outputEvent",
-      "topicEndpointUri": "MyEventGridTopicUriSetting",
-      "topicKeySetting": "MyEventGridTopicKeySetting",
       "direction": "out"
   }
   ]

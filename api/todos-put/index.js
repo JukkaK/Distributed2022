@@ -2,24 +2,28 @@ const todoService = require('../functions/services/todo');
 
 module.exports = async function (context, req) {
     context.log('JavaScript HTTP trigger function processed a request.');
+    context.log("MyEventGridTopicUriSetting: " + process.env["MyEventGridTopicUriSetting"]);
 
     if (req.body && req.body.task) {
         
-        var timeStamp = new Date().toISOString();
+        const { EventGridPublisherClient, AzureKeyCredential } = require("@azure/eventgrid");
 
-        context.bindings.outputEvent = {
-            id: 'message-id',
-            subject: 'subject-name',
-            dataVersion: '1.0',
-            eventType: 'event-type',
-            data: "event-data",
-            eventTime: timeStamp
-        };
+        const client = new EventGridPublisherClient(
+          process.env["MyEventGridTopicUriSetting"],
+          "EventGrid",
+          new AzureKeyCredential(process.env["MyEventGridTopicKeySetting"])
+        );
         
-        context.res = {
-            status: 200,
-            body: todoService.editTodos(context)
-        };
+        await client.send([
+          {
+            eventType: "Azure.Sdk.SampleEvent",
+            subject: "Event Subject",
+            dataVersion: "1.0",
+            data: {
+              hello: "world"
+            }
+          }
+        ]);
 
     }
     else {

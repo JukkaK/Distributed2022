@@ -1,5 +1,5 @@
 @description('The name of the function app that you wish to create.')
-param appName string = 'fnapp${uniqueString(resourceGroup().id)}'
+param appName string
 
 @description('Storage Account type')
 @allowed([
@@ -20,12 +20,18 @@ param location string = resourceGroup().location
 ])
 param runtime string = 'node'
 @secure()
-param cosmoscs string
+param cosmoscs string = ''
+param aiKey string
 
-var functionAppName = appName
-var hostingPlanName = appName
-var applicationInsightsName = appName
-var storageAccountName = '${uniqueString(resourceGroup().id)}azfunctions'
+//location shortener function
+var shortLocation = {
+  'westeurope': 'we'
+  'northeurope': 'ne'
+}[location]
+
+var functionAppName = 'func-distributed-${appName}-${shortLocation}-001'
+
+var storageAccountName = 'stgdist${appName}${shortLocation}001'
 var functionWorkerRuntime = runtime
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-08-01' = {
@@ -38,7 +44,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-08-01' = {
 }
 
 resource hostingPlan 'Microsoft.Web/serverfarms@2021-03-01' = {
-  name: hostingPlanName
+  name: 'plan-distributed-${appName}-${shortLocation}-001'
   location: location
   sku: {
     name: 'Y1'
@@ -72,7 +78,7 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
         }
         {
           name: 'FUNCTIONS_EXTENSION_VERSION'
-          value: '~2'
+          value: '~4'
         }
         {
           name: 'WEBSITE_NODE_DEFAULT_VERSION'
@@ -80,36 +86,15 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
         }
         {
           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value: applicationInsights.properties.InstrumentationKey
+          value: aiKey
         }
         {
           name: 'FUNCTIONS_WORKER_RUNTIME'
           value: functionWorkerRuntime
         }
-        // {
-        //   name: 'CosmosConnectionString'
-        //   value: cosmoscs
-        // }
         {
-          name: 'COSMOSDB_HOST'
-          value: 'mongodb-aluwohbosnxec.mongo.cosmos.azure.com'
-        }
-        {
-          name: 'COSMOSDB_PORT'
-          value: '10255'
-        }
-        {
-          name: 'COSMOSDB_DBNAME'
-          value: 'mongodb-aluwohbosnxec'
-        }
-        {
-          name: 'COSMOSDB_USER'
-          value: 'mongodb-aluwohbosnxec'
-        }
-        //Never do this in real life
-        {
-          name: 'COSMOSDB_PASSWORD'
-          value: 'RCfdzUSCQFC5HzIznndvps0p7SO4H0rAHr6gb1FPr4xv96lnkCzDEwTvgwvDob7kvWAsq5C1Fm3uACDbahRjgA=='
+          name: 'CosmosDbConnectionString'
+          value: cosmoscs
         }
       ]
       ftpsState: 'FtpsOnly'
@@ -119,12 +104,4 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
   }
 }
 
-resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: applicationInsightsName
-  location: location
-  kind: 'web'
-  properties: {
-    Application_Type: 'web'
-    Request_Source: 'rest'
-  }
-}
+

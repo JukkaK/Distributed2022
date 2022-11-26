@@ -2,6 +2,7 @@
 
 # vs code
 /.vscode
+*.code-workspace
 
 # dependencies
 /node_modules

@@ -9,9 +9,9 @@
       "route": "todo"
     },
     {
-      "type": "eventGrid",
-      "name": "outputEvent",
-      "direction": "out"
-  }
+      "type": "http",
+      "direction": "out",
+      "name": "res"
+    }
   ]
 }

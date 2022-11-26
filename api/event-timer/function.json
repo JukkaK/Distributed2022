@@ -1,6 +1,12 @@
 {
   "bindings": [
     {
+      "type": "httpTrigger",
+      "direction": "in",
+      "route": "todo",
+      "authLevel": "anonymous"
+    },
+    {
       "type": "eventGrid",
       "name": "outputEvent",
       "topicEndpointUri": "MyEventGridTopicUriSetting",

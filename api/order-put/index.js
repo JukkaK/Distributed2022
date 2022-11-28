@@ -1,9 +1,10 @@
+require('dotenv').config()
 const { EventGridPublisherClient, AzureKeyCredential } = require("@azure/eventgrid");
 
 module.exports = async function (context, req) {
     context.log('JavaScript HTTP trigger function processed a request.');
     console.log("-------------------------------")
-    context.log("MyEventGridTopicUriSetting: " + process.env.MyEventGridTopicUriSetting);
+    context.log("MyEventGridTopicUriSetting: " + process.env.MyEventGridTopicUrlSetting);
     console.log("-------------------------------")
     context.log("MyEventGridTopicKeySetting: " + process.env.MyEventGridTopicKeySetting);
     console.log("-------------------------------")
@@ -11,7 +12,7 @@ module.exports = async function (context, req) {
     if (req.body && req.body.task) {
 
         const client = new EventGridPublisherClient(
-          process.env.MyEventGridTopicUriSetting,
+          process.env.MyEventGridTopicUrlSetting,
           "EventGrid",
           new AzureKeyCredential(process.env.MyEventGridTopicKeySetting)
         );

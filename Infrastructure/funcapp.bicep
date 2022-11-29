@@ -27,6 +27,7 @@ param aiKey string
 var shortLocation = {
   'westeurope': 'we'
   'northeurope': 'ne'
+  'eastus': 'eus'
 }[location]
 
 var functionAppName = 'func-distributed-${appName}-${shortLocation}-001'

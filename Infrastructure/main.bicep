@@ -5,6 +5,7 @@ param buildtag string = utcNow()
 var shortLocation = {
   'westeurope': 'we'
   'northeurope': 'ne'
+  'eastus': 'eus'
 }[location]
 
 //Set deployment scope to subscription
@@ -23,9 +24,19 @@ resource dataRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   location: location
 }
 
-resource backendRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: 'rg-${projectName}-backend-${shortLocation}-001'
-  location: location
+resource backendWeRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: 'rg-${projectName}-backend-we-001'
+  location: 'westeurope'
+}
+
+resource backendNeRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: 'rg-${projectName}-backend-ne-001'
+  location: 'northeurope'
+}
+
+resource backendEusRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: 'rg-${projectName}-backend-eus-001'
+  location: 'eastus'
 }
 
 resource messageRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
@@ -43,7 +54,7 @@ module cosmosdb 'cosmosdb.bicep' = {
 }
 
 module ai 'ai.bicep' = {
-  scope: backendRg
+  scope: backendWeRg
   name: 'ai-${buildtag}'
 }
 
@@ -58,11 +69,33 @@ module dbapi 'funcapp.bicep' = {
   }
 }
 
-module workers 'funcapp.bicep' = {
-  scope: backendRg
-  name: 'backend'
+module workersWE 'funcapp.bicep' = {
+  scope: backendWeRg
+  name: 'backendWe'
   params: {
-    location: location
+    location: 'westeurope'
+    cosmoscs: cosmosdb.outputs.cs
+    aiKey: ai.outputs.aiKey
+    appName: 'backend'   
+  }
+}
+
+module workersNE 'funcapp.bicep' = {
+  scope: backendNeRg
+  name: 'backendNe'
+  params: {
+    location: 'northeurope'
+    cosmoscs: cosmosdb.outputs.cs
+    aiKey: ai.outputs.aiKey
+    appName: 'backend'   
+  }
+}
+
+module workersEus 'funcapp.bicep' = {
+  scope: backendEusRg
+  name: 'backendEus'
+  params: {
+    location: 'eastus'
     cosmoscs: cosmosdb.outputs.cs
     aiKey: ai.outputs.aiKey
     appName: 'backend'   

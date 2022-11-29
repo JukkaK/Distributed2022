@@ -31,7 +31,7 @@ jobs:
           npm run test --if-present
           popd
 
-      - name: 'Run Azure Functions Action'
+      - name: 'Deploy function to West Europe'
         uses: Azure/functions-action@v1
         id: fa
         with:
@@ -39,3 +39,21 @@ jobs:
           slot-name: 'Production'
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_6212319974C3492D9B5D698C7107A96C }}
+
+      - name: 'Deploy function to North Europe'
+        uses: Azure/functions-action@v1
+        id: fa
+        with:
+          app-name: 'func-distributed-backend-ne-001'
+          slot-name: 'Production'
+          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_6212319974C3492D9B5D698C7107A96C }}          
+
+      - name: 'Deploy function to East US'
+        uses: Azure/functions-action@v1
+        id: fa
+        with:
+          app-name: 'func-distributed-backend-eus-001'
+          slot-name: 'Production'
+          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_6212319974C3492D9B5D698C7107A96C }}               

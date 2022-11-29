@@ -38,7 +38,7 @@ export async function addItem(data) {
   return await response.json();
 }
 
-export async function addItem(data) {
+export async function deleteItem(data) {
   console.log(data.number)
   const response = await fetch('http://localhost:7071/api/db', {
       method: 'DELETE',

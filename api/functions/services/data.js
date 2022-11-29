@@ -1,5 +1,3 @@
-const randomId = require('random-id')
-
 const data = {
     todos: [
       {
@@ -30,24 +28,7 @@ const data = {
     getToDos: function() {
         return data.todos;
     },
-    addToDo: function(task) {
-        task.id = randomId(10);
-        data.todos.push(task);
-        return {
-            message: "task added",
-            tasks: data.todos.length
-        }
-    },
-    deleteToDos: function(id) {
-        data.todos = data.todos.filter(todo => todo.id != id)
-        return {
-            message: "task deleted",
-            tasks: data.todos.length
-        }
-    },
     editTodos: function(task) {
-      console.log("päivitys aloitettu")
-      console.log(task)
         data.todos = data.todos.map(todo => {
             if (todo.ean == task.ean) todo.amount = (todo.amount - task.amount);
             return {

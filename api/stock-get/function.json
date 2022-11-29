@@ -5,8 +5,8 @@
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "methods": ["put"],
-      "route": "todo"
+      "methods": ["get"],
+      "route": "stock"
     },
     {
       "type": "http",

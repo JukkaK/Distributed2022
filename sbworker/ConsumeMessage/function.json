@@ -1,12 +1,11 @@
 {
   "bindings": [
-      {
-      "queueName": "sb-distributed-distributed-we-001-front-queue",
-      "connection": "MyServiceBus",
-      "name": "myQueueItem",
+    {
+      "name": "mySbMsg",
       "type": "serviceBusTrigger",
-      "direction": "in"      
-      }
-  ],
-  "disabled": false
-  }
+      "direction": "in",
+      "queueName": "sb-distributed-distributed-we-001-front-queue",
+      "connection": "sb-distributed-distributed-we-001_RootManageSharedAccessKey_SERVICEBUS"
+    }
+  ]
+}

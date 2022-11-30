@@ -94,7 +94,7 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
           value: functionWorkerRuntime
         }
         {
-          name: 'serviceBusConnection'
+          name: 'sb-distributed-distributed-we-001_RootManageSharedAccessKey_SERVICEBUS'
           value: serviceBusConnectionString
         }
       ]

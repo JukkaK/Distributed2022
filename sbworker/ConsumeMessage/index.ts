@@ -1,4 +1,4 @@
-const { delay, ServiceBusClient, ServiceBusMessage } = require("@azure/service-bus");
+//const { delay, ServiceBusClient, ServiceBusMessage } = require("@azure/service-bus");
 
 module.exports = async function(context, myQueueItem) {
     context.log('Node.js ServiceBus queue trigger function processed message', myQueueItem);

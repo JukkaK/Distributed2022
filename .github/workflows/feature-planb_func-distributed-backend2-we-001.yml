@@ -4,6 +4,9 @@
 name: Deploy Serbice Bus Worker test
 
 on:
+  push:
+    branches:
+      - feature/planb
   workflow_dispatch:
 
 env:

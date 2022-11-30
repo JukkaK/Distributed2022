@@ -1,0 +1,12 @@
+{
+  "bindings": [
+      {
+      "queueName": "sb-distributed-distributed-we-001-front-queue",
+      "connection": "serviceBusConnection",
+      "name": "myQueueItem",
+      "type": "serviceBusTrigger",
+      "direction": "in"      
+      }
+  ],
+  "disabled": false
+  }

@@ -8,5 +8,11 @@ resource sb 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' = {
   location: location
 }
 
+resource sbq 'Microsoft.ServiceBus/namespaces/queues@2022-01-01-preview' = {
+  name: '${sbName}-front-queue'
+  parent: sb
+}
+
 var serviceBusEndpoint = '${sb.id}/AuthorizationRules/RootManageSharedAccessKey'
-var serviceBusConnectionString = listKeys(serviceBusEndpoint, sb.apiVersion).primaryConnectionString
+
+output serviceBusConnectionString string = listKeys(serviceBusEndpoint, sb.apiVersion).primaryConnectionString

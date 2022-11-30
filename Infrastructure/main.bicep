@@ -30,6 +30,11 @@ resource backendWeRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   location: 'westeurope'
 }
 
+resource backendWeRg2 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: 'rg-${projectName}-backend-we-002'
+  location: 'westeurope'
+}
+
 resource backendNeRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: 'rg-${projectName}-backend-ne-001'
   location: 'northeurope'
@@ -83,6 +88,17 @@ module workersWE 'funcapp.bicep' = {
     cosmoscs: cosmosdb.outputs.cs
     aiKey: ai.outputs.aiKey
     appName: 'backend'   
+  }
+}
+
+module workersWE2 'funcappsb.bicep' = {
+  scope: backendWeRg
+  name: 'backendWe2'
+  params: {
+    location: 'westeurope'
+    serviceBusConnectionString: servicebus.outputs.serviceBusConnectionString
+    aiKey: ai.outputs.aiKey
+    appName: 'backend2'   
   }
 }
 

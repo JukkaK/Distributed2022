@@ -94,11 +94,8 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
           value: functionWorkerRuntime
         }
         {
-          name: 'CosmosDbConnectionString'
-          value: serviceBusConnectionString
-        }
-        {
           name: 'serviceBusConnection'
+          value: serviceBusConnectionString
         }
       ]
       ftpsState: 'FtpsOnly'

@@ -7,43 +7,13 @@ export async function getAllProducts() {
   return await response.json();
 }
 
-export async function getProductById(data) {
-  console.log(data.id)
-  const response = await fetch('http://localhost:7071/api/db', {
-    method: 'PUT',
-    headers: {'Content-Type': 'application/json --verbose'},
-    body: JSON.stringify({"document":{"id": data.id}})
-  });
-  return await response.json();
-}
-
 
 export async function editAmount(data) {
-  console.log(data.number)
-  const response = await fetch('http://localhost:7071/api/db', {
+  console.log(data)
+  const response = await fetch(`/api/order`, {
       method: 'PUT',
-      headers: {'Content-Type': 'application/json --verbose'},
-      body: JSON.stringify({"document":{"id": data.id, "order": data.number}})
-  })
-  return await response.json();
-}
-
-export async function addItem(data) {
-  console.log(data.number)
-  const response = await fetch('http://localhost:7071/api/db', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json --verbose'},
-      body: JSON.stringify({"document":{"name": data.name, "saldo": data.number}})
-  })
-  return await response.json();
-}
-
-export async function deleteItem(data) {
-  console.log(data.number)
-  const response = await fetch('http://localhost:7071/api/db', {
-      method: 'DELETE',
-      headers: {'Content-Type': 'application/json --verbose'},
-      body: JSON.stringify({"id": data.id})
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({task: data})
   })
   return await response.json();
 }

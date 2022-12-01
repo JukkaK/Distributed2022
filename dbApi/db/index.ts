@@ -50,9 +50,9 @@ const httpTrigger: AzureFunction = async function (
             response = {
                 documentResponse: updateItemSaldo,
               };
-        } else if (req?.body?.document.id) {
+        } else if (req?.body?.document.ean) {
           response = {
-            documentResponse: await db.findItemById(req?.body?.document.id),
+            documentResponse: await db.findItemByEan(req?.body?.document.ean),
           };
         }  else {
               throw Error("No document found");

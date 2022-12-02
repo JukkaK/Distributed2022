@@ -15,6 +15,8 @@ module.exports = async function (context, req) {
       const sbClient = new ServiceBusClient(process.env.SBconnectionString);
       const sender = sbClient.createSender(process.env.queueName);
       
+      context.log("sending with ean " + req.body.task.ean);
+
       await sbClient.sender.send(
         {
           ean: req.body.task.ean,
@@ -22,6 +24,8 @@ module.exports = async function (context, req) {
           amount: req.body.task.amount
         }
       )
+
+      context.log("sent message with ean " + req.body.task.ean);
 
         // const client = new EventGridPublisherClient(
         //   process.env.MyEventGridTopicUrlSetting,

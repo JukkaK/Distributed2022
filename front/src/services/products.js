@@ -1,6 +1,6 @@
 export async function getAllProducts() {
 
-  const response = await fetch('http://localhost:7071/api/db', {
+  const response = await fetch('https://func-distributed-dbapi-we-001.azurewebsites.net/api/db', {
     method: 'GET',
     headers: {'Content-Type': 'application/json --verbose'},
   });

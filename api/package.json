@@ -4,12 +4,13 @@
   "description": "",
   "scripts": {
     "start": "func start",
-    "test": "echo \"No tests yet...\""
+    "test": "echo \"No tests yet...\"",
+    "build": "next build && rm -rf ./.next/cache"
   },
   "dependencies": {
     "@azure/eventgrid": "^4.11.0",
     "@azure/service-bus": "^7.7.3",
-    "azure-functions-core-tools": "^4.0.4895",
+    "azure-functions-core-tools": "^2.0.3",
     "dotenv": "^16.0.3"
   }
 }

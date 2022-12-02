@@ -13,18 +13,14 @@ const httpTrigger: AzureFunction = async function (
 
     switch (req.method) {
       case "GET":
-        if (req?.query.id || (req?.body && req?.body?.id)) {
-          response = {
-            documentResponse: await db.findItemById(req?.body?.id),
-          };
-        } else {
+       
           // allows empty query to return all items
           const dbQuery =
             req?.query?.dbQuery || (req?.body && req?.body?.dbQuery);
           response = {
             documentResponse: await db.findItems(dbQuery),
           };
-        }
+        
         break;
       case "POST":
         if (req?.body?.document) {
@@ -48,12 +44,17 @@ const httpTrigger: AzureFunction = async function (
 
         break;
       case "PUT":
-        if (req?.body?.document) {
+        console.log(req?.body?.document)
+        if (req?.body?.document.order) {
             const updateItemSaldo = await db.updateItemSaldo(req?.body?.document);
             response = {
                 documentResponse: updateItemSaldo,
               };
-        } else {
+        } else if (req?.body?.document.ean) {
+          response = {
+            documentResponse: await db.findItemByEan(req?.body?.document.ean),
+          };
+        }  else {
               throw Error("No document found");
         }
         break;

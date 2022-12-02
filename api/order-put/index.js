@@ -17,8 +17,10 @@ module.exports = async function (context, req) {
       
       context.log("sending with ean " + req.body.task.ean);
 
+      const message = "{ean: " + req.body.task.ean + ", name: " + req.body.task.name + ", amount: " + req.body.task.amount + "}"
+
       await sender.sendMessages({
-        body: "my-message-body"
+        body: message
       });
 
       // await sbClient.sender.send(

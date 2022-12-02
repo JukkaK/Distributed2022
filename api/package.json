@@ -4,8 +4,7 @@
   "description": "",
   "scripts": {
     "start": "func start",
-    "test": "echo \"No tests yet...\"",
-    "build": "next build && rm -rf ./.next/cache"
+    "test": "echo \"No tests yet...\""
   },
   "dependencies": {
     "@azure/eventgrid": "^4.11.0",

@@ -17,13 +17,17 @@ module.exports = async function (context, req) {
       
       context.log("sending with ean " + req.body.task.ean);
 
-      await sbClient.sender.send(
-        {
-          ean: req.body.task.ean,
-          name: req.body.task.name,
-          amount: req.body.task.amount
-        }
-      )
+      await sender.sendMessages({
+        body: "my-message-body"
+      });
+
+      // await sbClient.sender.send(
+      //   {
+      //     ean: req.body.task.ean,
+      //     name: req.body.task.name,
+      //     amount: req.body.task.amount
+      //   }
+      // )
 
       context.log("sent message with ean " + req.body.task.ean);
 

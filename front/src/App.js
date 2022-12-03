@@ -25,10 +25,9 @@ const App = () => {
   const [products, setProducts] = useState([])
   const [cart, setCart] = useState(order)
 
-  console.log(getAllProducts())
   useEffect(() => {
     updateProducts()
-
+ 
     const interval = setInterval(() => {
         //update products every 10 sec
         updateProducts()
@@ -39,7 +38,7 @@ const App = () => {
   const updateProducts = () => {
     getAllProducts()
     .then(initialProducts => {
-      setProducts(initialProducts)
+      setProducts(initialProducts.documentResponse)
     })
   }
 
@@ -65,7 +64,7 @@ const App = () => {
       const vastaava = products.find(e => e.ean === item.ean)
       if (item.amount > vastaava.amount) {
         shoppingList.splice(shoppingList.findIndex(e => e.ean === item.ean),1);
-        return alert(`So sorry, we have item ${item.name} only ${vastaava.amount}. Item will be removed`);
+        return alert(`So sorry, we have item ${item.name} only ${vastaava.amount}. Items will be removed`);
       }
       return console.log("we have it")
     })

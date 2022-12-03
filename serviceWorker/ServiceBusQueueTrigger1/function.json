@@ -4,8 +4,8 @@
       "name": "mySbMsg",
       "type": "serviceBusTrigger",
       "direction": "in",
-      "queueName": "sb-distributed-distributed-we-001-front-queue",
-      "connection": "sb-distributed-distributed-we-001_RootManageSharedAccessKey_SERVICEBUS"
+      "queueName": "sb-distributed-we-001-front-queue",
+      "connection": "serviceBusConnectionString"
     }
   ],
   "scriptFile": "../dist/ServiceBusQueueTrigger1/index.js"

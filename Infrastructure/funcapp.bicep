@@ -22,6 +22,8 @@ param runtime string = 'node'
 @secure()
 param cosmoscs string = ''
 param aiKey string
+@secure()
+param serviceBusConnectionString string = ''
 
 //location shortener function
 var shortLocation = {
@@ -96,6 +98,10 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
         {
           name: 'CosmosDbConnectionString'
           value: cosmoscs
+        }
+        {
+          name: 'serviceBusConnectionString'
+          value: serviceBusConnectionString
         }
       ]
       ftpsState: 'FtpsOnly'

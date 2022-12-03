@@ -18,7 +18,7 @@ var planName = 'asp-${projectName}-${shortLocation}-001'
 var funcName = 'func-${projectName}-${shortLocation}-001'
 var egTopicNameFront = 'evgt-${projectName}-front-${shortLocation}-001'
 var egTopicNameDist = 'evgt-${projectName}-workers-${shortLocation}-001'
-var sbName = 'sb-${projectName}-distributed-${shortLocation}-001'
+var sbName = 'sb-${projectName}-${shortLocation}-001'
 
 resource dataRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: 'rg-${projectName}-data-${shortLocation}-001'
@@ -27,11 +27,6 @@ resource dataRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
 
 resource backendWeRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: 'rg-${projectName}-backend-we-001'
-  location: 'westeurope'
-}
-
-resource backendWeRg2 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: 'rg-${projectName}-backend-we-002'
   location: 'westeurope'
 }
 
@@ -86,28 +81,18 @@ module workersWE 'funcapp.bicep' = {
   params: {
     location: 'westeurope'
     cosmoscs: cosmosdb.outputs.cs
+    serviceBusConnectionString: servicebus.outputs.serviceBusConnectionString
     aiKey: ai.outputs.aiKey
     appName: 'backend'   
   }
 }
-
-module workersWE2 'funcappsb.bicep' = {
-  scope: backendWeRg
-  name: 'backendWe2'
-  params: {
-    location: 'westeurope'
-    serviceBusConnectionString: servicebus.outputs.serviceBusConnectionString
-    aiKey: ai.outputs.aiKey
-    appName: 'backend2'   
-  }
-}
-
 module workersNE 'funcapp.bicep' = {
   scope: backendNeRg
   name: 'backendNe'
   params: {
     location: 'northeurope'
     cosmoscs: cosmosdb.outputs.cs
+    serviceBusConnectionString: servicebus.outputs.serviceBusConnectionString
     aiKey: ai.outputs.aiKey
     appName: 'backend'   
   }
@@ -119,6 +104,7 @@ module workersEus 'funcapp.bicep' = {
   params: {
     location: 'eastus'
     cosmoscs: cosmosdb.outputs.cs
+    serviceBusConnectionString: servicebus.outputs.serviceBusConnectionString
     aiKey: ai.outputs.aiKey
     appName: 'backend'   
   }

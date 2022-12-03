@@ -3,7 +3,7 @@ import { Schema, model, connect } from "mongoose";
 let db=null;
 
 const itemSchema = new Schema(
-  { itemName: String, saldo: Number},
+  { itemName: String, saldo: Number, ean: Number},
   { timestamps: true }
 );
 const itemModel = model("item", itemSchema, "Store");
@@ -20,8 +20,8 @@ export const addItem = async (doc) => {
 
   return await modelToInsert.save();
 };
-export const findItemById = async (id) => {
-  return await itemModel.findById(id);
+export const findItemByEan = async (ean) => {
+  return await itemModel.find({ean: ean});
 };
 export const findItems = async (query = {}) => {
   return await itemModel.find({});
@@ -30,5 +30,5 @@ export const deleteItemById = async (id) => {
   return await itemModel.findByIdAndDelete(id);
 };
 export const updateItemSaldo = async (doc) => {
-    return await itemModel.findByIdAndUpdate(doc.id, {saldo: doc.order});
+    return await itemModel.findOneAndUpdate({query: {ean: doc.ean}, update: {saldo: doc.order}});
 };

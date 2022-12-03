@@ -9,11 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const eventGridTrigger = function (context, eventGridEvent) {
+const serviceBusQueueTrigger = function (context, mySbMsg) {
     return __awaiter(this, void 0, void 0, function* () {
-        context.log(typeof eventGridEvent);
-        context.log(eventGridEvent);
+        context.log('ServiceBus queue trigger function processed message', mySbMsg);
     });
 };
-exports.default = eventGridTrigger;
+exports.default = serviceBusQueueTrigger;
 //# sourceMappingURL=index.js.map

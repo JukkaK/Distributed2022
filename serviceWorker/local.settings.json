@@ -1,0 +1,8 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "sbjktestwe001_SERVICEBUS": "Endpoint=sb://sb-jktest-we-001.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Tm3V9lPq1vdzdxoSmAUC2Md1ysjb9Gf/n4XGGv9L540="
+  }
+}

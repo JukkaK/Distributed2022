@@ -1,0 +1,12 @@
+{
+  "bindings": [
+    {
+      "name": "mySbMsg",
+      "type": "serviceBusTrigger",
+      "direction": "in",
+      "queueName": "sb-distributed-we-001-front-queue",
+      "connection": "serviceBusConnectionString"
+    }
+  ],
+  "scriptFile": "../dist/ServiceBusQueueTrigger1/index.js"
+}

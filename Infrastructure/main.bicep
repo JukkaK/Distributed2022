@@ -18,6 +18,7 @@ var planName = 'asp-${projectName}-${shortLocation}-001'
 var funcName = 'func-${projectName}-${shortLocation}-001'
 var egTopicNameFront = 'evgt-${projectName}-front-${shortLocation}-001'
 var egTopicNameDist = 'evgt-${projectName}-workers-${shortLocation}-001'
+var sbName = 'sb-${projectName}-${shortLocation}-001'
 
 resource dataRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: 'rg-${projectName}-data-${shortLocation}-001'
@@ -41,6 +42,11 @@ resource backendEusRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
 
 resource messageRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: 'rg-${projectName}-message-${shortLocation}-001'
+  location: location
+}
+
+resource messageRg2 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: 'rg-${projectName}-message-${shortLocation}-002'
   location: location
 }
 
@@ -75,17 +81,18 @@ module workersWE 'funcapp.bicep' = {
   params: {
     location: 'westeurope'
     cosmoscs: cosmosdb.outputs.cs
+    serviceBusConnectionString: servicebus.outputs.serviceBusConnectionString
     aiKey: ai.outputs.aiKey
     appName: 'backend'   
   }
 }
-
 module workersNE 'funcapp.bicep' = {
   scope: backendNeRg
   name: 'backendNe'
   params: {
     location: 'northeurope'
     cosmoscs: cosmosdb.outputs.cs
+    serviceBusConnectionString: servicebus.outputs.serviceBusConnectionString
     aiKey: ai.outputs.aiKey
     appName: 'backend'   
   }
@@ -97,6 +104,7 @@ module workersEus 'funcapp.bicep' = {
   params: {
     location: 'eastus'
     cosmoscs: cosmosdb.outputs.cs
+    serviceBusConnectionString: servicebus.outputs.serviceBusConnectionString
     aiKey: ai.outputs.aiKey
     appName: 'backend'   
   }
@@ -116,6 +124,15 @@ module egworkers 'eventgrid.bicep' = {
   name: '${egTopicNameDist}-${buildtag}'
   params: {
     egName: egTopicNameDist
+    location: location
+  }
+}
+
+module servicebus 'servicebus.bicep' = {
+  scope: messageRg2
+  name: '${sbName}-${buildtag}'
+  params: {
+    sbName: sbName
     location: location
   }
 }

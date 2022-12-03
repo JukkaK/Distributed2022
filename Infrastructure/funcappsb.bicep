@@ -20,10 +20,8 @@ param location string = resourceGroup().location
 ])
 param runtime string = 'node'
 @secure()
-param cosmoscs string = ''
-param aiKey string
-@secure()
 param serviceBusConnectionString string = ''
+param aiKey string
 
 //location shortener function
 var shortLocation = {
@@ -96,11 +94,7 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
           value: functionWorkerRuntime
         }
         {
-          name: 'CosmosDbConnectionString'
-          value: cosmoscs
-        }
-        {
-          name: 'serviceBusConnectionString'
+          name: 'sb-distributed-distributed-we-001_RootManageSharedAccessKey_SERVICEBUS'
           value: serviceBusConnectionString
         }
       ]
@@ -110,5 +104,3 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
     httpsOnly: true
   }
 }
-
-

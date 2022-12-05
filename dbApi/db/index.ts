@@ -44,9 +44,7 @@ const httpTrigger: AzureFunction = async function (
 
         break;
       case "PUT":
-        
         if (JSON.parse(req.body.mySbMsg).amount) {
-          console.log("täs")
             const updateItemSaldo = await db.updateItemSaldo(JSON.parse(req.body.mySbMsg));
             response = {
                 documentResponse: updateItemSaldo,

@@ -69,7 +69,7 @@ const App = () => {
       return console.log("we have it")
     })
 
-    //place the order to backend and empty the cart
+    //place the order to Azure, update amounts and empty the cart
     shoppingList.map(product => purchase(product))
     updateProducts()
     setCart(order);
@@ -77,7 +77,11 @@ const App = () => {
 
   const purchase = (product) => {
     editAmount(product).then(response => {
-      console.log("reply", response)
+      if (response !== 200) {
+        console.log("errors", response)
+        return alert('Something went wrong, try again')
+      }
+      console.log("order done", response)
     })
   }
 

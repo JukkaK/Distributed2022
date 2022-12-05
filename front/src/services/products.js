@@ -17,5 +17,5 @@ export async function editAmount(data) {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({task: data})
   })
-  return await response.json();
+  return response.status
 }

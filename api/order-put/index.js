@@ -22,35 +22,7 @@ module.exports = async function (context, req) {
       await sender.sendMessages({
         body: message
       });
-
-      // await sbClient.sender.send(
-      //   {
-      //     ean: req.body.task.ean,
-      //     name: req.body.task.name,
-      //     amount: req.body.task.amount
-      //   }
-      // )
-
-      context.log("sent message with ean " + req.body.task.ean);
-
-        // const client = new EventGridPublisherClient(
-        //   process.env.MyEventGridTopicUrlSetting,
-        //   "EventGrid",
-        //   new AzureKeyCredential(process.env.MyEventGridTopicKeySetting)
-        // );
-        
-        // await client.send([
-        //   {
-        //     eventType: "Azure.Sdk.SampleEvent",
-        //     subject: "Event Subject",
-        //     dataVersion: "1.0",
-        //     data: {
-        //       ean: req.body.task.ean,
-        //       name: req.body.task.name,
-        //       amount: req.body.task.amount
-        //     }
-        //   }
-        // ]);
+        context.log("sent message with ean " + req.body.task.ean);
 
         context.res = {
             status: 200

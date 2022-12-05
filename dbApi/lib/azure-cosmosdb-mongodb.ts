@@ -30,5 +30,5 @@ export const deleteItemById = async (id) => {
   return await itemModel.findByIdAndDelete(id);
 };
 export const updateItemSaldo = async (doc) => {
-    return await itemModel.findOneAndUpdate({query: {ean: doc.ean}, update: {amount: doc.order}});
+    return await itemModel.findOneAndUpdate({query: {ean: doc.ean}, update: {amount: doc.amount}});
 };

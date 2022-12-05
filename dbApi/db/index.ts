@@ -44,15 +44,16 @@ const httpTrigger: AzureFunction = async function (
 
         break;
       case "PUT":
-        console.log(req?.body?.document)
-        if (req?.body?.document.order) {
-            const updateItemSaldo = await db.updateItemSaldo(req?.body?.document);
+        
+        if (JSON.parse(req.body.mySbMsg).amount) {
+          console.log("täs")
+            const updateItemSaldo = await db.updateItemSaldo(JSON.parse(req.body.mySbMsg));
             response = {
                 documentResponse: updateItemSaldo,
               };
-        } else if (req?.body?.document.ean) {
+        } else if (JSON.parse(req.body.mySbMsg).ean) {
           response = {
-            documentResponse: await db.findItemByEan(req?.body?.document.ean),
+            documentResponse: await db.findItemByEan(JSON.parse(req.body.mySbMsg).ean),
           };
         }  else {
               throw Error("No document found");

@@ -1,19 +1,25 @@
 ## Available Scripts
 
-In the project directory, you can run:
+In the fornt and api directories, you can run:
 
 ## Install dependecies
 
 ### `npm install`
 
 
-## JSON Serverin
+## API
 
-First start the JSON server
+Set environment varables (add these to `.env` file in `/api` folder):
 
-### `npm run server`
+```
+SBconnectionString : Primary Connection String.
+queueName: Name of the queue.  
+```
 
-You can see the content from [http://localhost:3001/notes](http://localhost:3001/notes)
+Start the API by going to `/api` folder
+
+### `npm start`
+
 
 ## Front
 
@@ -21,3 +27,4 @@ You can see the content from [http://localhost:3001/notes](http://localhost:3001
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+

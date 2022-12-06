@@ -15,9 +15,9 @@ module.exports = async function (context, req) {
       const sbClient = new ServiceBusClient(process.env.SBconnectionString);
       const sender = sbClient.createSender(process.env.queueName);
       
-      context.log("sending with ean " + req.body.task.ean);
+      const message = "\"{'ean': '" + req.body.task.ean + "', 'name': '" + req.body.task.name + "', 'amount': '" + req.body.task.amount + "'}\""
 
-      const message = "{ean: " + req.body.task.ean + ", name: " + req.body.task.name + ", amount: " + req.body.task.amount + "}"
+      context.log("SPA api sending message " + message);
 
       await sender.sendMessages({
         body: message

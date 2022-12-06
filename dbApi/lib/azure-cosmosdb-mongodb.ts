@@ -10,6 +10,7 @@ const itemModel = model("item", itemSchema, "Store");
 
 export const init = async () => {
   if(!db) {
+    console.log("connecting to mongodb with:" + process.env["CosmosDbConnectionString"]);
     db = await connect(process.env["CosmosDbConnectionString"]);
   }
 };
@@ -30,5 +31,6 @@ export const deleteItemById = async (id) => {
   return await itemModel.findByIdAndDelete(id);
 };
 export const updateItemSaldo = async (doc) => {
-    return await itemModel.findOneAndUpdate({query: {ean: doc.ean}, update: {saldo: doc.order}});
+  console.log("updating saldo with doc: " + doc);
+    return await itemModel.findOneAndUpdate({query: {ean: doc.ean}, update: {amount: doc.amount}});
 };

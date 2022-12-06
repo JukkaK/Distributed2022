@@ -9,9 +9,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const axios_1 = require("axios");
 const serviceBusQueueTrigger = function (context, mySbMsg) {
     return __awaiter(this, void 0, void 0, function* () {
         context.log('ServiceBus queue trigger function processed message', mySbMsg);
+        context.log("WEBSITE_SITE_NAME: " + process.env["WEBSITE_SITE_NAME"]);
+        yield (0, axios_1.default)({
+            method: 'PUT',
+            url: 'https://func-distributed-dbapi-we-001.azurewebsites.net/api/db',
+            data: { mySbMsg }
+        }).then(function (response) {
+            context.log("DB PUT succeeded:" + response);
+            return response;
+        });
+        context.log("DB PUT failed in: " + process.env["WEBSITE_SITE_NAME"]);
+        return "nope";
     });
 };
 exports.default = serviceBusQueueTrigger;

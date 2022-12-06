@@ -15,12 +15,12 @@ module.exports = async function (context, req) {
       const sbClient = new ServiceBusClient(process.env.SBconnectionString);
       const sender = sbClient.createSender(process.env.queueName);
       
-      context.log("sending with ean " + req.body.task.ean);
+      context.log("sending message " + req.body.task);
 
-      const message = "{ean: " + req.body.task.ean + ", name: " + req.body.task.name + ", amount: " + req.body.task.amount + "}"
+      //const message = "{ean: " + req.body.task.ean + ", name: " + req.body.task.name + ", amount: " + req.body.task.amount + "}"
 
       await sender.sendMessages({
-        body: message
+        body: req.body.task
       });
 
       // await sbClient.sender.send(

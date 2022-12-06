@@ -13,7 +13,7 @@ const httpTrigger: AzureFunction = async function (
 
     switch (req.method) {
       case "GET":
-       
+        context.log("Entering DB GET with: " + req);
           // allows empty query to return all items
           const dbQuery =
             req?.query?.dbQuery || (req?.body && req?.body?.dbQuery);
@@ -44,6 +44,7 @@ const httpTrigger: AzureFunction = async function (
 
         break;
       case "PUT":
+        context.log("Entering DB PUT with: " + req);
         if (JSON.parse(req.body.mySbMsg).amount) {
             const updateItemSaldo = await db.updateItemSaldo(JSON.parse(req.body.mySbMsg));
             response = {

@@ -10,10 +10,13 @@ const serviceBusQueueTrigger: AzureFunction = async function(context: Context, m
         url:'https://func-distributed-dbapi-we-001.azurewebsites.net/api/db',
         data: {mySbMsg}
         }).then(function (response) {
+            context.log("DB PUT succeeded:" + response);
             return response
           });
-
-        return "nope"  
+        
+          context.log("DB PUT failed in: " + process.env["WEBSITE_SITE_NAME"]);
+        
+          return "nope"  
     }
     
     

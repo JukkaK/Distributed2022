@@ -7,7 +7,7 @@ param region string = resourceGroup().location
 param secondaryRegion string = 'northeurope'
 param tertiaryRegion string = 'eastus'
 
-// Deployments - Coosmos DB Resources 
+// Deployments - Cosmos DB Resources 
 resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2022-08-15' = {
   name: toLower(cosmosDBAccountName)
   location: region
@@ -28,16 +28,16 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2022-08-15' = {
         failoverPriority: 0
         isZoneRedundant: false
       }
-      {
-        locationName: secondaryRegion
-        failoverPriority: 1
-        isZoneRedundant: false
-      }
-      {
-        locationName: tertiaryRegion
-        failoverPriority: 2
-        isZoneRedundant: false
-      }               
+      // {
+      //   locationName: secondaryRegion
+      //   failoverPriority: 1
+      //   isZoneRedundant: false
+      // }
+      // {
+      //   locationName: tertiaryRegion
+      //   failoverPriority: 2
+      //   isZoneRedundant: false
+      // }               
     ]
     apiProperties: {
       serverVersion: '4.2'

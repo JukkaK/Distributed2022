@@ -47,7 +47,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-08-01' = {
 }
 
 resource hostingPlan 'Microsoft.Web/serverfarms@2021-03-01' = {
-  name: 'plan-distributed-${appName}-${shortLocation}-001'
+  name: 'plan-distributed-${appName}-we-001'
   location: location
   sku: {
     name: 'Y1'

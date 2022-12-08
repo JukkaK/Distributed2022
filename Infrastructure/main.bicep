@@ -12,28 +12,28 @@ var shortLocation = {
 targetScope = 'subscription'
 
 var projectName = 'distributed'
-var dbName = 'cosmos-${projectName}-${shortLocation}-001'
+var dbName = 'cosmos-${projectName}-we-001'
 var sbName = 'sb-${projectName}-${shortLocation}-001'
 
-// var locations = [
-//   'westeurope'
-//   'northeurope'
-//   'eastus'
-// ]
+var locations = [
+  'westeurope'
+  'northeurope'
+  'eastus'
+]
 
 resource dataRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: 'rg-${projectName}-data-${shortLocation}-001'
   location: location
 }
 
-// resource dataRg2 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-//   name: 'rg-${projectName}-data-${shortLocation}-002'
-//   location: location
-// }
+resource dataRg2 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: 'rg-${projectName}-data-${shortLocation}-002'
+  location: location
+}
 
 resource backendWeRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: 'rg-${projectName}-backend-we-001'
-  location: 'westeurope'
+  location: location
 }
 
 resource backendNeRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
@@ -57,7 +57,7 @@ resource messageRg2 'Microsoft.Resources/resourceGroups@2021-04-01' = {
 }
 
 module cosmosdb 'cosmosdb.bicep' = {
-  scope: dataRg
+  scope: dataRg2
   name: '${dbName}-${buildtag}'
   params: {
     collection1Name: 'warehouseitems'

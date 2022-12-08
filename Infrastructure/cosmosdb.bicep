@@ -4,6 +4,8 @@ param cosmosDBAccountName string = 'mongodb-${uniqueString(resourceGroup().id)}'
 @description('The name for the first Mongo DB collection')
 param collection1Name string
 param region string = resourceGroup().location
+param secondaryRegion string = 'northeurope'
+param tertiaryRegion string = 'eastus'
 
 // Deployments - Coosmos DB Resources 
 resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2022-08-15' = {
@@ -15,8 +17,8 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2022-08-15' = {
   }
   properties:{
     databaseAccountOfferType:'Standard'
-    enableAutomaticFailover:false
-    enableMultipleWriteLocations:false
+    enableAutomaticFailover:true
+    enableMultipleWriteLocations:true
     consistencyPolicy: {
       defaultConsistencyLevel: 'Session'
     }
@@ -26,6 +28,16 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2022-08-15' = {
         failoverPriority: 0
         isZoneRedundant: false
       }
+      {
+        locationName: secondaryRegion
+        failoverPriority: 1
+        isZoneRedundant: false
+      }
+      {
+        locationName: tertiaryRegion
+        failoverPriority: 2
+        isZoneRedundant: false
+      }               
     ]
     apiProperties: {
       serverVersion: '4.2'

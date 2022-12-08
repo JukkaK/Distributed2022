@@ -20,8 +20,19 @@ var egTopicNameFront = 'evgt-${projectName}-front-${shortLocation}-001'
 var egTopicNameDist = 'evgt-${projectName}-workers-${shortLocation}-001'
 var sbName = 'sb-${projectName}-${shortLocation}-001'
 
+var locations = [
+  'westeurope'
+  'northeurope'
+  'eastus'
+]
+
 resource dataRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: 'rg-${projectName}-data-${shortLocation}-001'
+  location: location
+}
+
+resource dataRg2 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: 'rg-${projectName}-data-${shortLocation}-002'
   location: location
 }
 
@@ -75,6 +86,17 @@ module dbapi 'funcapp.bicep' = {
   }
 }
 
+module dbapifuncs 'funcapp.bicep' = [for item in locations: {
+  scope: dataRg2
+  name: 'dbapi-${item}'
+  params: {
+    location: item
+    cosmoscs: cosmosdb.outputs.cs
+    aiKey: ai.outputs.aiKey
+    appName: 'dbapi-${item}' 
+  }
+}]
+
 module workersWE 'funcapp.bicep' = {
   scope: backendWeRg
   name: 'backendWe'
@@ -107,24 +129,6 @@ module workersEus 'funcapp.bicep' = {
     serviceBusConnectionString: servicebus.outputs.serviceBusConnectionString
     aiKey: ai.outputs.aiKey
     appName: 'backend'   
-  }
-}
-
-module egfront 'eventgrid.bicep' = {
-  scope: messageRg
-  name: '${egTopicNameFront}-${buildtag}'
-  params: {
-    egName: egTopicNameFront
-    location: location
-  }
-}
-
-module egworkers 'eventgrid.bicep' = {
-  scope: messageRg
-  name: '${egTopicNameDist}-${buildtag}'
-  params: {
-    egName: egTopicNameDist
-    location: location
   }
 }
 

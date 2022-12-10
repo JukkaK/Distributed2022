@@ -43,6 +43,7 @@ jobs:
           app-name: 'func-distributed-backend-we-001'
           slot-name: 'Production'
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_8DA4F2EBE09647DE8CBFDECA3D14AF6F }}
 
       - name: 'Deploy function to North Europe'
         uses: Azure/functions-action@v1

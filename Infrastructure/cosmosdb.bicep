@@ -6,6 +6,7 @@ param collection1Name string
 param region string = resourceGroup().location
 param secondaryRegion string = 'northeurope'
 param tertiaryRegion string = 'eastus'
+param lawId string = ''
 
 // Deployments - Cosmos DB Resources 
 resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2022-08-15' = {
@@ -96,6 +97,14 @@ resource collection1 'Microsoft.DocumentDb/databaseAccounts/mongodbDatabases/col
     }
   }
 }
+
+// resource cosmosDB_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+//   name: '${cosmosDBAccountName}-law'
+//   properties: {
+//     workspaceId: lawId
+//   }
+//   scope: cosmosDbAccount
+// }
 
 //Do not do this in real life, just in course projects like this.
 output cs string = listConnectionStrings(resourceId('Microsoft.DocumentDB/databaseAccounts', cosmosDBAccountName), '2022-05-15').connectionStrings[0].connectionString

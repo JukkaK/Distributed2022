@@ -20,7 +20,7 @@ param location string = resourceGroup().location
 ])
 param runtime string = 'node'
 @secure()
-param serviceBusConnectionString string = ''
+param cosmoscs string = ''
 param aiKey string
 
 //location shortener function
@@ -32,7 +32,7 @@ var shortLocation = {
 
 var functionAppName = 'func-distributed-${appName}-${shortLocation}-001'
 
-var storageAccountName = 'stgdist${appName}${shortLocation}001'
+var storageAccountName = 'stgdb${appName}${shortLocation}001'
 var functionWorkerRuntime = runtime
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-08-01' = {
@@ -94,8 +94,8 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
           value: functionWorkerRuntime
         }
         {
-          name: 'sb-distributed-distributed-we-001_RootManageSharedAccessKey_SERVICEBUS'
-          value: serviceBusConnectionString
+          name: 'CosmosDbConnectionString'
+          value: cosmoscs
         }
       ]
       ftpsState: 'FtpsOnly'

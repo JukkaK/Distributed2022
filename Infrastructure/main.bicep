@@ -8,6 +8,12 @@ var shortLocation = {
   'eastus': 'eus'
 }[location]
 
+var dblocations = {
+  'westeurope': '@West Europe'
+  'northeurope': '@North Europe'
+  'eastus': '@East US'
+}[location]
+
 //Set deployment scope to subscription
 targetScope = 'subscription'
 
@@ -31,24 +37,24 @@ resource dataRg2 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   location: location
 }
 
-resource backendWeRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: 'rg-${projectName}-backend-we-001'
+// resource backendWeRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+//   name: 'rg-${projectName}-backend-we-001'
+//   location: location
+// }
+
+resource backendRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: 'rg-${projectName}-backend-001'
   location: location
 }
 
-resource backendNeRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: 'rg-${projectName}-backend-ne-001'
-  location: 'northeurope'
-}
+// resource backendNeRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+//   name: 'rg-${projectName}-backend-ne-001'
+//   location: 'northeurope'
+// }
 
-resource backendEusRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: 'rg-${projectName}-backend-eus-001'
-  location: 'eastus'
-}
-
-// resource messageRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-//   name: 'rg-${projectName}-message-${shortLocation}-001'
-//   location: location
+// resource backendEusRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+//   name: 'rg-${projectName}-backend-eus-001'
+//   location: 'eastus'
 // }
 
 resource messageRg2 'Microsoft.Resources/resourceGroups@2021-04-01' = {
@@ -67,20 +73,20 @@ module cosmosdb 'cosmosdb.bicep' = {
 }
 
 module ai 'ai.bicep' = {
-  scope: backendWeRg
+  scope: backendRg
   name: 'ai-${buildtag}'
 }
 
-module dbapi 'funcapp.bicep' = {
-  scope: dataRg
-  name: 'dbapi'
-  params: {
-    location: location
-    cosmoscs: cosmosdb.outputs.cs
-    aiKey: ai.outputs.aiKey
-    appName: 'dbapi'   
-  }
-}
+// module dbapi 'funcapp.bicep' = {
+//   scope: dataRg
+//   name: 'dbapi'
+//   params: {
+//     location: location
+//     cosmoscs: cosmosdb.outputs.cs
+//     aiKey: ai.outputs.aiKey
+//     appName: 'dbapi'   
+//   }
+// }
 
 // module dbapifuncs 'funcapp.bicep' = [for item in locations: {
 //   scope: dataRg2
@@ -93,46 +99,78 @@ module dbapi 'funcapp.bicep' = {
 //   }
 // }]
 
-module workersWE 'funcapp.bicep' = {
-  scope: backendWeRg
-  name: 'backendWe'
+module workerfuncs 'funcapp.bicep' = [for item in locations: {
+  scope: backendRg
+  name: 'serviceWorker-${item}'
   params: {
-    location: 'westeurope'
+    location: item
     cosmoscs: cosmosdb.outputs.cs
     serviceBusConnectionString: servicebus.outputs.serviceBusConnectionString
     aiKey: ai.outputs.aiKey
-    appName: 'backend'   
+    appName: 'backend'
+    dbapiUrl: 'https://func-distributed-dbapi-${shortLocation}-001.azurewebsites.net/api/db'
   }
-}
-module workersNE 'funcapp.bicep' = {
-  scope: backendNeRg
-  name: 'backendNe'
-  params: {
-    location: 'northeurope'
-    cosmoscs: cosmosdb.outputs.cs
-    serviceBusConnectionString: servicebus.outputs.serviceBusConnectionString
-    aiKey: ai.outputs.aiKey
-    appName: 'backend'   
-  }
-}
+}]
 
-module workersEus 'funcapp.bicep' = {
-  scope: backendEusRg
-  name: 'backendEus'
+module dbfuncs 'funcappsdb.bicep' = [for item in locations: {
+  scope: dataRg2
+  name: 'dbApi-${item}'
   params: {
-    location: 'eastus'
-    cosmoscs: cosmosdb.outputs.cs
-    serviceBusConnectionString: servicebus.outputs.serviceBusConnectionString
+    location: item
+    cosmoscs: cosmosdb.outputs.cs    
     aiKey: ai.outputs.aiKey
-    appName: 'backend'   
+    appName: 'dbapi' 
   }
-}
+}]
 
+// module workersWE 'funcapp.bicep' = {
+//   scope: backendWeRg
+//   name: 'backendWe'
+//   params: {
+//     location: 'westeurope'
+//     cosmoscs: cosmosdb.outputs.cs
+//     serviceBusConnectionString: servicebus.outputs.serviceBusConnectionString
+//     aiKey: ai.outputs.aiKey
+//     appName: 'backend'   
+//   }
+// }
+// module workersNE 'funcapp.bicep' = {
+//   scope: backendNeRg
+//   name: 'backendNe'
+//   params: {
+//     location: 'northeurope'
+//     cosmoscs: cosmosdb.outputs.cs
+//     serviceBusConnectionString: servicebus.outputs.serviceBusConnectionString
+//     aiKey: ai.outputs.aiKey
+//     appName: 'backend'   
+//   }
+// }
+
+// module workersEus 'funcapp.bicep' = {
+//   scope: backendEusRg
+//   name: 'backendEus'
+//   params: {
+//     location: 'eastus'
+//     cosmoscs: cosmosdb.outputs.cs
+//     serviceBusConnectionString: servicebus.outputs.serviceBusConnectionString
+//     aiKey: ai.outputs.aiKey
+//     appName: 'backend'   
+//   }
+// }
 module servicebus 'servicebus.bicep' = {
   scope: messageRg2
   name: '${sbName}-${buildtag}'
   params: {
     sbName: sbName
+    location: location
+    lawId: law.outputs.id
+  }
+}
+
+module law 'law.bicep' = {
+  scope: backendRg
+  name: 'lawWe'
+  params: {
     location: location
   }
 }

@@ -24,6 +24,7 @@ param cosmoscs string = ''
 param aiKey string
 @secure()
 param serviceBusConnectionString string = ''
+param dbapiUrl string = 'https://func-distributed-dbapi-we-001.azurewebsites.net/api/db'
 
 //location shortener function
 var shortLocation = {
@@ -47,7 +48,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-08-01' = {
 }
 
 resource hostingPlan 'Microsoft.Web/serverfarms@2021-03-01' = {
-  name: 'plan-distributed-${appName}-we-001'
+  name: 'plan-distributed-${appName}-${shortLocation}-001'
   location: location
   sku: {
     name: 'Y1'
@@ -103,6 +104,10 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
           name: 'serviceBusConnectionString'
           value: serviceBusConnectionString
         }
+        {
+          name: 'DBAPI_URL'
+          value: dbapiUrl
+        }        
       ]
       ftpsState: 'FtpsOnly'
       minTlsVersion: '1.2'

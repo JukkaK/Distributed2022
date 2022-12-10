@@ -33,9 +33,27 @@ jobs:
 
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
-        id: fa
+        id: fawe
         with:
           app-name: 'func-distributed-dbapi-we-001'
           slot-name: 'Production'
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_95D9B34DE108416288232F3892972C5D }}
+          
+      - name: 'Run Azure Functions Action'
+        uses: Azure/functions-action@v1
+        id: fane
+        with:
+          app-name: 'func-distributed-dbapi-ne-001'
+          slot-name: 'Production'
+          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_95D9B34DE108416288232F3892972C5D }}    
+          
+      - name: 'Run Azure Functions Action'
+        uses: Azure/functions-action@v1
+        id: faeus
+        with:
+          app-name: 'func-distributed-dbapi-eus-001'
+          slot-name: 'Production'
+          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_95D9B34DE108416288232F3892972C5D }}            

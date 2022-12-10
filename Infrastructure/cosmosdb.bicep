@@ -4,8 +4,11 @@ param cosmosDBAccountName string = 'mongodb-${uniqueString(resourceGroup().id)}'
 @description('The name for the first Mongo DB collection')
 param collection1Name string
 param region string = resourceGroup().location
+param secondaryRegion string = 'northeurope'
+param tertiaryRegion string = 'eastus'
+param lawId string = ''
 
-// Deployments - Coosmos DB Resources 
+// Deployments - Cosmos DB Resources 
 resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2022-08-15' = {
   name: toLower(cosmosDBAccountName)
   location: region
@@ -15,8 +18,8 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2022-08-15' = {
   }
   properties:{
     databaseAccountOfferType:'Standard'
-    enableAutomaticFailover:false
-    enableMultipleWriteLocations:false
+    enableAutomaticFailover:true
+    enableMultipleWriteLocations:true
     consistencyPolicy: {
       defaultConsistencyLevel: 'Session'
     }
@@ -26,6 +29,16 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2022-08-15' = {
         failoverPriority: 0
         isZoneRedundant: false
       }
+      {
+        locationName: secondaryRegion
+        failoverPriority: 1
+        isZoneRedundant: false
+      }
+      {
+        locationName: tertiaryRegion
+        failoverPriority: 2
+        isZoneRedundant: false
+      }               
     ]
     apiProperties: {
       serverVersion: '4.2'
@@ -84,6 +97,14 @@ resource collection1 'Microsoft.DocumentDb/databaseAccounts/mongodbDatabases/col
     }
   }
 }
+
+// resource cosmosDB_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+//   name: '${cosmosDBAccountName}-law'
+//   properties: {
+//     workspaceId: lawId
+//   }
+//   scope: cosmosDbAccount
+// }
 
 //Do not do this in real life, just in course projects like this.
 output cs string = listConnectionStrings(resourceId('Microsoft.DocumentDB/databaseAccounts', cosmosDBAccountName), '2022-05-15').connectionStrings[0].connectionString

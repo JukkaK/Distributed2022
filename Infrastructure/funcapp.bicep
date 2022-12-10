@@ -24,6 +24,7 @@ param cosmoscs string = ''
 param aiKey string
 @secure()
 param serviceBusConnectionString string = ''
+param dbapiUrl string = 'https://func-distributed-dbapi-we-001.azurewebsites.net/api/db'
 
 //location shortener function
 var shortLocation = {
@@ -103,6 +104,10 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
           name: 'serviceBusConnectionString'
           value: serviceBusConnectionString
         }
+        {
+          name: 'DBAPI_URL'
+          value: dbapiUrl
+        }        
       ]
       ftpsState: 'FtpsOnly'
       minTlsVersion: '1.2'

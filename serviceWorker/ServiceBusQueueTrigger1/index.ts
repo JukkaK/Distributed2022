@@ -5,7 +5,7 @@ const serviceBusQueueTrigger: AzureFunction = async function(context: Context, m
     context.log('ServiceBus queue trigger function processed message', mySbMsg);
     context.log("WEBSITE_SITE_NAME: " + process.env["WEBSITE_SITE_NAME"]); 
     context.log("db api url to call: " + process.env["DBAPI_URL"]);
-    context.log("DB PUT DATA :" + mySbMsg);
+    context.log("DB PUT DATA: ", mySbMsg);
         await axios({
         method: 'PUT',
         url:process.env["DBAPI_URL"],        

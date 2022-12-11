@@ -21,7 +21,7 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2022-08-15' = {
     enableAutomaticFailover:true
     enableMultipleWriteLocations:true
     consistencyPolicy: {
-      defaultConsistencyLevel: 'Session'
+      defaultConsistencyLevel: 'Eventual'
     }
     locations: [
       {

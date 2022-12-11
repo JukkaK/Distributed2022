@@ -10,10 +10,10 @@ const httpTrigger: AzureFunction = async function (
 
     // create 1 db connection for all functions
     await db.init();
+    context.log("DB API " + process.env["WEBSITE_SITE_NAME"] + " triggered with req: " + req);
 
     switch (req.method) {
       case "GET":
-        context.log("Entering DB GET with");
           // allows empty query to return all items
           const dbQuery =
             req?.query?.dbQuery || (req?.body && req?.body?.dbQuery);

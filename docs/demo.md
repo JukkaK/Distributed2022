@@ -39,6 +39,13 @@
     * So we opted to Plan B and use Service Bus, which handles the message distribution out-of-the-box.
     * Using PaaS components eases implementing, as most critical layers as available as services. Understanding and configuring the services takes some time, though.
     * Cosmos DB offers interesting choices with consistency: however, even with the most inconsisted setting of _'eventual consistency'_ everything seemed to be pretty consistent. It would probably require quite a heavy load to get some inconsistencies.
+* Fault tolerance
+    * System is somewhat fault-tolerance.
+    * Shutting down worker nodes is fine.
+    * Shutting down dbapis is not, since every worker is paired with a dbapi as they are simply configured with dbapi function endpoints.
+    * DbApis and Cosmos DB are quite fault-tolerant, as Cosmos DB has three replicas if one goes down, dbapis can use other replicas.
+    * Service Bus and Front end are regionally fault tolerant, but if all 3 datacenters in West Europe go down, they go down.
+    * Adding a load balancer between workers and db would help.
 * Implementation    
     * Turns out that .Net is still a first class citizen in Azure: could have implemented a peek-and-destroy -type handling of the messages with that.
     * Found out that our main dbapi died when having to handle both read and write -operations, so we dedicated one dbapi just for reads by shutting down it's worker node.

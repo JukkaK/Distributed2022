@@ -2,24 +2,31 @@
 param location string = 'westeurope'
 param buildtag string = utcNow()
 //location shortener function
-var shortLocation = {
-  'westeurope': 'we'
-  'northeurope': 'ne'
-  'eastus': 'eus'
-}[location]
+// var shortLocation = {
+//   'westeurope': 'we'
+//   'northeurope': 'ne'
+//   'eastus': 'eus'
+// }[location]
 
-var dblocations = {
-  'westeurope': '@West Europe'
-  'northeurope': '@North Europe'
-  'eastus': '@East US'
-}[location]
+//location shortener function
+var shortLocation = {
+  westeurope: 'we'
+  northeurope: 'ne'
+  eastus: 'eus'
+}
+
+var dblocation = {
+  westeurope: 'West Europe'
+  northeurope: 'North Europe'
+  eastus: 'East US'
+}
 
 //Set deployment scope to subscription
 targetScope = 'subscription'
 
 var projectName = 'distributed'
 var dbName = 'cosmos-${projectName}-we-001'
-var sbName = 'sb-${projectName}-${shortLocation}-001'
+var sbName = 'sb-${projectName}-${shortLocation[location]}-001'
 
 var locations = [
   'westeurope'
@@ -28,12 +35,12 @@ var locations = [
 ]
 
 resource dataRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: 'rg-${projectName}-data-${shortLocation}-001'
+  name: 'rg-${projectName}-data-${shortLocation[location]}-001'
   location: location
 }
 
 resource dataRg2 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: 'rg-${projectName}-data-${shortLocation}-002'
+  name: 'rg-${projectName}-data-${shortLocation[location]}-002'
   location: location
 }
 
@@ -58,7 +65,7 @@ resource backendRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
 // }
 
 resource messageRg2 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: 'rg-${projectName}-message-${shortLocation}-002'
+  name: 'rg-${projectName}-message-${shortLocation[location]}-002'
   location: location
 }
 
@@ -108,7 +115,7 @@ module workerfuncs 'funcapp.bicep' = [for item in locations: {
     serviceBusConnectionString: servicebus.outputs.serviceBusConnectionString
     aiKey: ai.outputs.aiKey
     appName: 'backend'
-    dbapiUrl: 'https://func-distributed-dbapi-${shortLocation}-001.azurewebsites.net/api/db'
+    dbapiUrl: 'https://func-distributed-dbapi-${shortLocation[item]}-001.azurewebsites.net/api/db'
   }
 }]
 
@@ -117,7 +124,7 @@ module dbfuncs 'funcappsdb.bicep' = [for item in locations: {
   name: 'dbApi-${item}'
   params: {
     location: item
-    cosmoscs: cosmosdb.outputs.cs    
+    cosmoscs: '${cosmosdb.outputs.cs}${dblocation[item]}'
     aiKey: ai.outputs.aiKey
     appName: 'dbapi' 
   }

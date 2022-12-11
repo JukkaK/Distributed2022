@@ -17,9 +17,9 @@ your project.
 
 The aim of the project was to develop a skeleton of a webshop system with public cloud Platform-as-a-Service (PaaS) components. We chose Microsoft Azure as the platform as one of project members had previous experience on using it, though not actually implementing a distributed system. With this in mind, we set on exploring what PaaS services would fit the project, with clear understanding the the architecture we ended up with might not be one we designed at the start. We did, however, had quite a clear though of the architectural layers we were going to implement and the languages to be used.
 
-In whole, the architecture pattern used can be best though as a modular monolith - a service made of multiple components that can be changed to use different services if needed, but not implementing a microservice pattern where, for example, each node would be represented by a self-sustained service with it's own data layer. Implementing a microservice would require more considerantion of the lifecycle of each invidual service, including things like fault tolerance, which we felt to be a too large undertaking.
-
 ### Architecture
+
+In whole, the architecture pattern used can be best though as a modular monolith - a service made of multiple components that can be changed to use different services if needed, but not implementing a microservice pattern where, for example, each node would be represented by a self-sustained service with would handle the operations for it's own domain. While we do deploy a complete set of services to several regions under the messaging layer, each set of these services consist of similar services with just region-specific configurations, so they are more of a (arguably somewhat incomplete) fault tolerance features than microservices as such.
 
 ![Architecture](./architecture_final.drawio.png)
 
@@ -60,6 +60,12 @@ Service Bus supports even more fault tolerant messaging options, like peek-locki
 
 We chose our transaction layer to be the distributed part of the system and ended up having an X amount of distributed worker nodes that consume messages from messaging layer and perform the update operations agains the data layer. We have a single worker implementation and deploy it to multiple Azure Function Apps that are geographically distributed. Worker application has an inbound Service Bus binding that is configured to listen to the Service Bus Queue. When messages appear in the queue, a function is triggered, the function reads the message and subsequently calls the data layer to perform an update transaction with the details gathered from the message payload. After completion the function stops, and is triggered again when the next message is picked up from the queue.
 
+Worker receives data from service bus in mySbMsg object, where the payload simply is:
+
+```
+{ ean: 2222, name: 'gift two', amount: 2 }
+```
+
 * Worker node implementation can be found under /serviceWorker-folder: https://github.com/JukkaK/Distributed2022/tree/main/serviceWorker
 * Azure Functions docs: https://learn.microsoft.com/en-us/azure/azure-functions/
 * Azure Functions service bus trigger implementation: https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-service-bus-trigger?tabs=in-process%2Cextensionv5&pivots=programming-language-javascript
@@ -69,6 +75,37 @@ We chose our transaction layer to be the distributed part of the system and ende
 We chose Azure Cosmos DB as our data storage option, as it is a global distributed service. We ended up deploying Cosmos DB in three regions in hopes of getting interesting results with consistency levels. That did not really happen as data remained woefully consistent despite our best efforts, like setting the consistency level to _'eventual consistency'_.
 
 Our Cosmos DB acts as a document storage with MongoDB API as implementation option. MongoDB was chosen because one of our team members was familiar with it. On top of it, we implemented a simple database api that also runs in an Azure Function application. As we decided to deploy the DB three regions, it made sense to deploy the apis to three regions as well, to ensure that all regions get writes.
+
+DbApi receives simple API calls where the update request is in the body:
+
+```
+{
+  method: 'PUT',
+  url: 'https://func-distributed-dbapi-ne-001.azurewebsites.net/api/db',
+  originalUrl: 'https://func-distributed-dbapi-ne-001.azurewebsites.net/api/db',
+  headers: {
+
+...
+
+  body: { mySbMsg: { ean: 2222, name: 'gift two', amount: 2 } },
+  rawBody: '{"mySbMsg":{"ean":2222,"name":"gift two","amount":2}}'
+}
+```
+
+The document representation of the data in Mongo DB nosql database is:
+
+```
+{
+	"_id" : ObjectId("63928e20534bf30140349975"),
+	"ean" : 2222,
+	"pic" : "gift2.png",
+	"name" : "gift two",
+	"amount" : 21,
+	"updatedAt" : {
+		"$date" : 1670768206190
+	}
+}
+```
 
 * Cosmos DB implementation is IAC-only.
 * DbApi implementation can be found under folder dbApi: https://github.com/JukkaK/Distributed2022/tree/main/dbApi

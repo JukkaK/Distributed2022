@@ -15,17 +15,33 @@ your project.
 
 ## Design Principles
 
-__TODO: Jukka__
-
 The aim of the project was to develop a skeleton of a webshop system with public cloud Platform-as-a-Service (PaaS) components. We chose Microsoft Azure as the platform as one of project members had previous experience on using it, though not actually implementing a distributed system. With this in mind, we set on exploring what PaaS services would fit the project, with clear understanding the the architecture we ended up with might not be one we designed at the start. We did, however, had quite a clear though of the architectural layers we were going to implement and the languages to be used.
 
 In whole, the architecture pattern used can be best though as a modular monolith - a service made of multiple components that can be changed to use different services if needed, but not implementing a microservice pattern where, for example, each node would be represented by a self-sustained service with it's own data layer. Implementing a microservice would require more considerantion of the lifecycle of each invidual service, including things like fault tolerance, which we felt to be a too large undertaking.
+
+### Architecture
+
+![Architecture](./architecture_final.drawio.png)
 
 ### Frontend layer
 
 The frontend layer representing a simple webshop was to be implemented as a single page app (SPA) with React framework that would fetch data for the webshop from the data layer, and initiate updates by send asynchronous messages to the middleware messaging layer. 
 
 We chose Azure Static Web Apps (SWA) as the PaaS service to be used and had no reason to change it during the implementation phase, even if we did stumble into several limitations concerning the integration with messaging layer. SWA is actually made of two different services; hosting of the SPA application and hosting of a backend function, which is a limited version of an Azure Function Application. One of the limitations is that the backend function only supports http-binding for the function, and it is mainly meant to be used between the SPA and the backend function itself. Implementing a messaging integration, however, requires an outbound binding to the messaging layer, which the backend function does not support (which is not really documented well). We went around this limitation by implementing the messaging integration by using Azure nodejs npm-package for the messaging server, which is a bit of a messy way of implementing the integration, but works well enough for demonstration purposes. The more elegant way would have been not to deploy the backend function at all, but either to implement the integration directly to the SPA, or by deploying a separate Azure Function App to handle the messaging integration (which would have required a preminium offering of the SWA).
+
+Message from frontend to service bus in formatted like this:
+
+```
+{ ean: 2222, name: 'gift two', amount: 2 }
+```
+
+References:
+
+* React single page app can be found under /front -folder in repo: https://github.com/JukkaK/Distributed2022/tree/main/front.
+* SPA backend function can be found under /api -folder in repo: https://github.com/JukkaK/Distributed2022/tree/feature/more-docs/api.
+* No IAC -implemntation for SPA, since it's not in the scope of project as such (and implementing static web apps with Bicep has some issues).
+* Static Web App docs: https://learn.microsoft.com/en-us/azure/static-web-apps/
+* Github issue with explanations and partial solution for function bindings: https://github.com/Azure/static-web-apps/issues/141
 
 ### Messaging layer
 
@@ -35,15 +51,28 @@ We ended up using _Service Bus_ as it implements a lot of the features required 
 
 Service Bus supports even more fault tolerant messaging options, like peek-locking, meaning that a subscribed service first reads a message from the queue and reserves it so that competing services are not able to read it. After completing it's transaction, it then deletes the message from the queue, and if the transaction for some reason fails, queue releases the message back for others to consume after a configurable period of time. Unfortunately our chosen implementation language (javascript) did not support this feature yet.
 
+* Service Bus has no application implementation, only IAC-implementation.
+* Azure messaging service comparison: https://learn.microsoft.com/en-us/azure/event-grid/compare-messaging-services
+* Service bus queues and topics: https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-queues-topics-subscriptions
+* Service bus receive operations: https://learn.microsoft.com/en-us/azure/service-bus-messaging/message-transfers-locks-settlement#settling-receive-operations
+
 ### Distributed layer
 
 We chose our transaction layer to be the distributed part of the system and ended up having an X amount of distributed worker nodes that consume messages from messaging layer and perform the update operations agains the data layer. We have a single worker implementation and deploy it to multiple Azure Function Apps that are geographically distributed. Worker application has an inbound Service Bus binding that is configured to listen to the Service Bus Queue. When messages appear in the queue, a function is triggered, the function reads the message and subsequently calls the data layer to perform an update transaction with the details gathered from the message payload. After completion the function stops, and is triggered again when the next message is picked up from the queue.
 
+* Worker node implementation can be found under /serviceWorker-folder: https://github.com/JukkaK/Distributed2022/tree/main/serviceWorker
+* Azure Functions docs: https://learn.microsoft.com/en-us/azure/azure-functions/
+* Azure Functions service bus trigger implementation: https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-service-bus-trigger?tabs=in-process%2Cextensionv5&pivots=programming-language-javascript
+
 ### Data layer
 
-We chose Azure Cosmos DB as our data storage option, as it is a global distributed service. The initial architectural decision was to use it only in a single region, with the option to fan it out to the same regions our worker nodes are in, if time permits trying that out.
+We chose Azure Cosmos DB as our data storage option, as it is a global distributed service. We ended up deploying Cosmos DB in three regions in hopes of getting interesting results with consistency levels. That did not really happen as data remained woefully consistent despite our best efforts, like setting the consistency level to _'eventual consistency'_.
 
-Our Cosmos DB acts as a document storage with MongoDB API as implementation option. MongoDB was chosen because one of our team members was familiar with it. On top of it, we implemented a simple database api that also runs in an Azure Function application. 
+Our Cosmos DB acts as a document storage with MongoDB API as implementation option. MongoDB was chosen because one of our team members was familiar with it. On top of it, we implemented a simple database api that also runs in an Azure Function application. As we decided to deploy the DB three regions, it made sense to deploy the apis to three regions as well, to ensure that all regions get writes.
+
+* Cosmos DB implementation is IAC-only.
+* DbApi implementation can be found under folder dbApi: https://github.com/JukkaK/Distributed2022/tree/main/dbApi
+* Cosmos DB consistency levels: https://learn.microsoft.com/en-us/azure/cosmos-db/consistency-levels
 
 ### Logging
 
@@ -88,6 +117,18 @@ module workersNE 'funcapp.bicep' = {
 
 In real-life scenario, one should never pass secret values as outputs in iac-code, as they tend to show up in deployment logs. The current preferred way of doing this configuration in Azure would be not to use secret keys at all, but to enable a _managed identity_ in the function apps, that would be authorized to access the Service Bus. A managed identity is basically a service identity created for a service in the Azure Active Directory Tenant used. But using classic connection strings is probably more illustrative way of doing this for the purposes of this project.
 
+The connectivity between worker nodes and dbApis is implemented as simple url configuration like:
+
+```
+https://func-distributed-dbapi-we-001.azurewebsites.net/api/db
+```
+
+The connectivity between dbApi and Cosmos DB uses connection strings with a preference hint for the write region. Every regional dbApi has a hint set to the respective Cosmos DB region:
+
+```
+mongodb://cosmos-distributed-we-001:secretkey@cosmos-distributed-we-001.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@cosmos-distributed-we-001@East US
+```
+
 ### Fault Tolerance
 
 In order to understand fault tolerance in Azure public cloud, there are several key concepts that need to be understood first.
@@ -109,8 +150,11 @@ __TODO: Ville__
 
 __TODO: Ville__
 
-- I think we need to do some more implementation to either get this one, or get the shared distributed state working. Deploying regional dbapis and cosmosdb would probably be enough.
+We implemented synchronization and consistency in the DB layer by deploying regional replicas to the database and playing with the consistency levels. This was supported by deploying both the worker nodes and dbApi to different regions, so we could be sure that every database replica would get writes. By setting the consistency level to 'eventual consistency' we actually hoped to see that the replicas would be out-of-sync from time to time, but we did not really witness this. 
 
+Cosmos DB does not really have built-in tools for viewing and comparing the states of different replicas (or at least we did not find those) and given time we probably should have implented regional frontends that would each have read and displayed the exact amounts of items in their respective database replicas. The only place where we could actually see something happening between different replicas was the view showing replication latency between regions.
+
+![replication latency](./replication_latency.png)
 
 
 ## Scalability and performance

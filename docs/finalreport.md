@@ -21,6 +21,10 @@ The aim of the project was to develop a skeleton of a webshop system with public
 
 In whole, the architecture pattern used can be best though as a modular monolith - a service made of multiple components that can be changed to use different services if needed, but not implementing a microservice pattern where, for example, each node would be represented by a self-sustained service with it's own data layer. Implementing a microservice would require more considerantion of the lifecycle of each invidual service, including things like fault tolerance, which we felt to be a too large undertaking.
 
+### Architecture
+
+![Architecture](./architecture_final.drawio.png)
+
 ### Frontend layer
 
 The frontend layer representing a simple webshop was to be implemented as a single page app (SPA) with React framework that would fetch data for the webshop from the data layer, and initiate updates by send asynchronous messages to the middleware messaging layer. 

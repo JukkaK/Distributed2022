@@ -47,6 +47,17 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-08-01' = {
   kind: 'Storage'
 }
 
+resource tableServices 'Microsoft.Storage/storageAccounts/tableServices@2021-09-01' = {
+  name: 'default'
+  parent: storageAccount
+  properties: {}
+}
+
+resource table 'Microsoft.Storage/storageAccounts/tableServices/tables@2021-08-01' = {
+  name: 'state'
+  parent: tableServices
+}
+
 resource hostingPlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: 'plan-distributed-${appName}-${shortLocation}-001'
   location: location

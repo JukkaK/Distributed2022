@@ -27,12 +27,18 @@ targetScope = 'subscription'
 var projectName = 'distributed'
 var dbName = 'cosmos-${projectName}-we-001'
 var sbName = 'sb-${projectName}-${shortLocation[location]}-001'
+var egTopicName = 'evgt-${projectName}-${shortLocation[location]}-001'
 
 var locations = [
   'westeurope'
   'northeurope'
   'eastus'
 ]
+
+resource messageRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: 'rg-${projectName}-message-${shortLocation[location]}-001'
+  location: location
+}
 
 resource dataRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: 'rg-${projectName}-data-${shortLocation[location]}-001'
@@ -178,6 +184,15 @@ module law 'law.bicep' = {
   scope: backendRg
   name: 'lawWe'
   params: {
+    location: location
+  }
+}
+
+module eg 'eventgrid.bicep' = {
+  scope: messageRg
+  name: '${egTopicName}-${buildtag}'
+  params: {
+    egName: egTopicName
     location: location
   }
 }

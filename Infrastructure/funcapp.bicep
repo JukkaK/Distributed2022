@@ -38,28 +38,34 @@ var functionAppName = 'func-distributed-${appName}-${shortLocation}-001'
 var storageAccountName = 'stgdist${appName}${shortLocation}002'
 var functionWorkerRuntime = runtime
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2021-08-01' = {
+resource storage 'Microsoft.Storage/storageAccounts@2021-08-01' = {
   name: storageAccountName
   location: location
   sku: {
     name: storageAccountType
   }
   kind: 'Storage'
-  properties: {
-    
+  properties: {}
+}
+
+resource tables 'Microsoft.Storage/storageAccounts/tableServices@2021-09-01' = {
+  name: 'default'
+  parent: storageAccount
+  properties: {}
+}
+
+resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' existing = {
+  name: storageAccountName
+
+  resource tableServices 'tableServices@2021-09-01' existing = {
+    name: 'default'
   }
 }
 
-// resource tableServices 'Microsoft.Storage/storageAccounts/tableServices@2021-09-01' = {
-//   name: 'default'
-//   parent: storageAccount
-//   properties: {}
-// }
-
-// resource table 'Microsoft.Storage/storageAccounts/tableServices/tables@2021-08-01' = {
-//   name: 'state'
-//   parent: tableServices
-// }
+resource table 'Microsoft.Storage/storageAccounts/tableServices/tables@2021-09-01' = {
+  name: 'state'
+  parent: storageAccount::tableServices
+}
 
 resource hostingPlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: 'plan-distributed-${appName}-${shortLocation}-001'

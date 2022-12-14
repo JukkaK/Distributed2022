@@ -38,4 +38,4 @@ jobs:
           app-name: 'func-distributed-backend-eus-001'
           slot-name: 'Production'
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_4C6907F1275247F3BE1ADCE718A5B477 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_EA5F4340962E41D8B1ACFB7F41905F7D }}

@@ -29,6 +29,19 @@ The frontend layer representing a simple webshop was to be implemented as a sing
 
 We chose Azure Static Web Apps (SWA) as the PaaS service to be used and had no reason to change it during the implementation phase, even if we did stumble into several limitations concerning the integration with messaging layer. SWA is actually made of two different services; hosting of the SPA application and hosting of a backend function, which is a limited version of an Azure Function Application. One of the limitations is that the backend function only supports http-binding for the function, and it is mainly meant to be used between the SPA and the backend function itself. Implementing a messaging integration, however, requires an outbound binding to the messaging layer, which the backend function does not support (which is not really documented well). We went around this limitation by implementing the messaging integration by using Azure nodejs npm-package for the messaging server, which is a bit of a messy way of implementing the integration, but works well enough for demonstration purposes. The more elegant way would have been not to deploy the backend function at all, but either to implement the integration directly to the SPA, or by deploying a separate Azure Function App to handle the messaging integration (which would have required a preminium offering of the SWA).
 
+Integration to service bus is crated from the backend api with service bus sdk:
+
+```
+const { ServiceBusClient } = require("@azure/service-bus");
+
+...
+
+    const sbClient = new ServiceBusClient(process.env.SBconnectionString);
+      const sender = sbClient.createSender(process.env.queueName);
+      
+      const message = { ean: req.body.task.ean, name: req.body.task.name, amount: req.body.task.amount }    
+```
+
 Message from frontend to service bus in formatted like this:
 
 ```
@@ -38,7 +51,7 @@ Message from frontend to service bus in formatted like this:
 References:
 
 * React single page app can be found under /front -folder in repo: https://github.com/JukkaK/Distributed2022/tree/main/front.
-* SPA backend function can be found under /api -folder in repo: https://github.com/JukkaK/Distributed2022/tree/feature/more-docs/api.
+* SPA backend function can be found under /api -folder in repo: https://github.com/JukkaK/Distributed2022/tree/feature/main/api.
 * No IAC -implemntation for SPA, since it's not in the scope of project as such (and implementing static web apps with Bicep has some issues).
 * Static Web App docs: https://learn.microsoft.com/en-us/azure/static-web-apps/
 * Github issue with explanations and partial solution for function bindings: https://github.com/Azure/static-web-apps/issues/141
@@ -114,6 +127,16 @@ The document representation of the data in Mongo DB nosql database is:
 ### Logging
 
 We use Azure Application Insights as to log and debug our function apps. Every function app is connected to the same Application Insight -instance and provide logging that goes through the layers, which the exception of the message layer, where we use Service Bus metrics to observe the amount of messages passing through the queue.
+
+### Infrastructure-as-code
+
+The IAC implementation is in __/Infrastucture__ -folder. It does not cover the whole solution (the static web app has been created via portal, as there tend to be some challenges with the application deployment if the resource is created with IAC, and also some additional log forwarding to cosmos db and service bus has been done manually). While the infra implementation is mostly out of the scope for the project, it is included in the repository as it's easier to illustrate the node discovery configuration in the code.
+
+The IAC code has been deployed via AZ CLI command line interface, so after logging in and setting the deployment context (ie. Azure subscription), deployment has been run with command in the Infrastructure folder:
+
+```
+az deployment create --location westeurope --template-file main.bicep
+```
 
 ## Functionalities
 

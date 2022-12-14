@@ -64,6 +64,40 @@ We ended up using _Service Bus_ as it implements a lot of the features required 
 
 Service Bus supports even more fault tolerant messaging options, like peek-locking, meaning that a subscribed service first reads a message from the queue and reserves it so that competing services are not able to read it. After completing it's transaction, it then deletes the message from the queue, and if the transaction for some reason fails, queue releases the message back for others to consume after a configurable period of time. Unfortunately our chosen implementation language (javascript) did not support this feature yet.
 
+The relevant part of service bus message format:
+
+```
+  bindingData: {
+    invocationId: '0175dcfa-9e7f-4269-9889-0777e17b2e89',
+    messageReceiver: {},
+    messageSession: {},
+    messageActions: {},
+    sessionActions: {},
+    receiveActions: {},
+    client: {
+      fullyQualifiedNamespace: 'sb-distributed-we-001.servicebus.windows.net',
+      isClosed: false,
+      transportType: 0,
+      identifier: 'sb-distributed-we-001.servicebus.windows.net-b3b7489b-e52a-4afc-a66c-2b009b03422b'
+    },
+    deliveryCount: 1,
+    lockToken: '44863086-e54f-45a8-b8fa-993d46434c80',
+    expiresAtUtc: '2022-12-14T22:36:50.52',
+    expiresAt: '2022-12-14T22:36:50.52+00:00',
+    enqueuedTimeUtc: '2022-12-14T20:36:45.52',
+    enqueuedTime: '2022-12-14T20:36:45.52+00:00',
+    messageId: 'e3500ddd88cf41d385c6f8944f8a3554',
+    sequenceNumber: 310,
+    applicationProperties: {},
+    userProperties: {},
+    ean: 2222,
+    name: 'gift two',
+    amount: 1
+  }
+```
+
+Where _userProperties_-block contains the actual message payload.
+
 * Service Bus has no application implementation, only IAC-implementation.
 * Azure messaging service comparison: https://learn.microsoft.com/en-us/azure/event-grid/compare-messaging-services
 * Service bus queues and topics: https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-queues-topics-subscriptions

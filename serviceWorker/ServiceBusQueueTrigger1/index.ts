@@ -16,15 +16,13 @@ const serviceBusQueueTrigger: AzureFunction = async function(context: Context, m
         }).then(function (response) {
             context.log("axios response: ", response.status);
                 
-                context.bindings.outputEvent = {                    
-                    dataVersion: '1.0',
-                    eventType: 'update-state',
-                    data: {
-                        messageid: context.bindingData.messageId,
-                        node: process.env["WEBSITE_SITE_NAME"] 
-                    },
-                
-                }
+            context.bindings.outputEvent = {
+                id: 'message-id',
+                subject: 'subject-name',
+                dataVersion: '1.0',
+                eventType: 'event-type',
+                data: "event-data",                
+            };
                 context.log("sent event");
 
             return response

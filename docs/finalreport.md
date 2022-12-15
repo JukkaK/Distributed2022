@@ -8,14 +8,13 @@
 
 ## Project goals
 
-__TODO: Jari__
+The purpose of the project was to learn to understand the details of a distributed system by implementing a small-scale/simple webshop with public cloud Platform-as-a-Service (PaaS) components. We chose Microsoft Azure as the platform as one of project members had previous experience on using it, though not actually implementing a distributed system. At the same time, this gave the other members of the group a good opportunity to familiarize themselves with Azure and the functionalities it offers.
 
-. The project’s goal(s) and core functionality. Identifying the applications / services that can build on
-your project.
+Although Azure offers functionality that even implements the features of the distributed system automatically for the user, it does not automatically make the implementation of the project easier. Using Azure meant additional work in terms of configuring system settings and coordinating functionalities. This was known to bring a challenge to the implementation of the project, but since one of the group members was familiar with the system, we believed we would overcome this challenge.
 
 ## Design Principles
 
-The aim of the project was to develop a skeleton of a webshop system with public cloud Platform-as-a-Service (PaaS) components. We chose Microsoft Azure as the platform as one of project members had previous experience on using it, though not actually implementing a distributed system. With this in mind, we set on exploring what PaaS services would fit the project, with clear understanding the the architecture we ended up with might not be one we designed at the start. We did, however, had quite a clear though of the architectural layers we were going to implement and the languages to be used.
+We set on exploring what PaaS services would fit the project, with clear understanding the the architecture we ended up with might not be one we designed at the start. We did, however, had quite a clear though of the architectural layers we were going to implement and the languages to be used.
 
 ### Architecture
 

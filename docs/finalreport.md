@@ -297,9 +297,9 @@ __TODO: Ville__
 
 ### Synchronization and consistency
 
-__TODO: Ville__
+We implemented synchronization and consistency in the DB layer by deploying regional replicas to the database and playing with the consistency levels. This was supported by deploying both the worker nodes and dbApi to different regions, so we could be sure that every database replica would get writes. By setting the consistency level to 'eventual consistency' we actually hoped to see that the replicas would be out-of-sync from time to time, but we did not really witness this.
 
-We implemented synchronization and consistency in the DB layer by deploying regional replicas to the database and playing with the consistency levels. This was supported by deploying both the worker nodes and dbApi to different regions, so we could be sure that every database replica would get writes. By setting the consistency level to 'eventual consistency' we actually hoped to see that the replicas would be out-of-sync from time to time, but we did not really witness this. 
+Other consistency levels are Strong, Bounded-staleness, Session and Consistent Prefix. So it would have been possible for us to choose Strong consistency, which would have been offered linearizability guarantee. This means serving requests concurrently. 
 
 Cosmos DB does not really have built-in tools for viewing and comparing the states of different replicas (or at least we did not find those) and given time we probably should have implented regional frontends that would each have read and displayed the exact amounts of items in their respective database replicas. The only place where we could actually see something happening between different replicas was the view showing replication latency between regions.
 

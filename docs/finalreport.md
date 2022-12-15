@@ -107,6 +107,10 @@ The relevant part of service bus message format:
     amount: 1
   }
 ```
+Azure offers a comprehensive selection for viewing and managing a Service Bus messages.
+
+![ServiceBus](./pics/servicebus.jpg)
+
 
 Where _userProperties_-block contains the actual message payload.
 

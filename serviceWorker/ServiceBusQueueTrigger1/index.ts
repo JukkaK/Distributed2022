@@ -14,6 +14,15 @@ const serviceBusQueueTrigger: AzureFunction = async function(context: Context, m
         data: {mySbMsg}
         }).then(function (response) {
 
+            context.bindings.outputEvent = {                
+                subject: 'state update',
+                dataVersion: '1.0',
+                eventType: 'event-type',
+                data: {
+                    messageId: context.bindingData.messageId
+                }                                 
+            };
+
             return response
           });    
         

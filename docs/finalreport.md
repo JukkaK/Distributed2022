@@ -123,7 +123,7 @@ Azure offers a comprehensive selection for viewing and managing a Service Bus me
 
 We chose our transaction layer to be the distributed part of the system and ended up having an three of distributed worker nodes that consume messages from messaging layer and perform the update operations agains the data layer. We have a single worker implementation and deploy it to multiple Azure Function Apps that are geographically distributed. Worker application has an inbound Service Bus binding that is configured to listen to the Service Bus Queue. When messages appear in the queue, a function is triggered, the function reads the message and subsequently calls the data layer to perform an update transaction with the details gathered from the message payload. After completion the function stops, and is triggered again when the next message is picked up from the queue.
 
-Function that triggers when message comes to the Service Bus Queu looks like this:
+Function that triggers when message comes to the Service Bus Queue looks like this:
 ```
 import { AzureFunction, Context } from "@azure/functions"
 ...
@@ -190,6 +190,8 @@ The document representation of the data in Mongo DB nosql database is:
 ### Logging
 
 We use Azure Application Insights as to log and debug our function apps. Every function app is connected to the same Application Insight -instance and provide logging that goes through the layers, which the exception of the message layer, where we use Service Bus metrics to observe the amount of messages passing through the queue.
+
+![Logs](./pics/logs.jpg)
 
 ### Infrastructure-as-code
 

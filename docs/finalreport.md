@@ -107,12 +107,12 @@ The relevant part of service bus message format:
     amount: 1
   }
 ```
+Where _userProperties_-block contains the actual message payload.
+
 Azure offers a comprehensive selection for viewing and managing a Service Bus messages.
 
 ![ServiceBus](./pics/servicebus.jpg)
 
-
-Where _userProperties_-block contains the actual message payload.
 
 * Service Bus has no application implementation, only IAC-implementation.
 * Azure messaging service comparison: https://learn.microsoft.com/en-us/azure/event-grid/compare-messaging-services
@@ -121,7 +121,20 @@ Where _userProperties_-block contains the actual message payload.
 
 ### Distributed layer
 
-We chose our transaction layer to be the distributed part of the system and ended up having an X amount of distributed worker nodes that consume messages from messaging layer and perform the update operations agains the data layer. We have a single worker implementation and deploy it to multiple Azure Function Apps that are geographically distributed. Worker application has an inbound Service Bus binding that is configured to listen to the Service Bus Queue. When messages appear in the queue, a function is triggered, the function reads the message and subsequently calls the data layer to perform an update transaction with the details gathered from the message payload. After completion the function stops, and is triggered again when the next message is picked up from the queue.
+We chose our transaction layer to be the distributed part of the system and ended up having an three of distributed worker nodes that consume messages from messaging layer and perform the update operations agains the data layer. We have a single worker implementation and deploy it to multiple Azure Function Apps that are geographically distributed. Worker application has an inbound Service Bus binding that is configured to listen to the Service Bus Queue. When messages appear in the queue, a function is triggered, the function reads the message and subsequently calls the data layer to perform an update transaction with the details gathered from the message payload. After completion the function stops, and is triggered again when the next message is picked up from the queue.
+
+Function that triggers when message comes to the Service Bus Queu looks like this:
+```
+import { AzureFunction, Context } from "@azure/functions"
+...
+const serviceBusQueueTrigger: AzureFunction = async function(context: Context, mySbMsg: any): Promise<Object> {
+        await axios({
+        method: 'PUT',
+        url:process.env["DBAPI_URL"],        
+        data: {mySbMsg}
+...
+
+```
 
 Worker receives data from service bus in mySbMsg object, where the payload simply is:
 

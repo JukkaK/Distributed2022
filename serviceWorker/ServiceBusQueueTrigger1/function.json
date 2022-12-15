@@ -13,7 +13,12 @@
       "topicEndpointUri": "MyEventGridTopicUriSetting",
       "topicKeySetting": "MyEventGridTopicKeySetting",
       "direction": "out"
-  }
+    },
+    {
+      "type": "http",
+      "name": "httpResponse",
+      "direction": "out"
+    }
   ],
   "scriptFile": "../dist/ServiceBusQueueTrigger1/index.js"
 }

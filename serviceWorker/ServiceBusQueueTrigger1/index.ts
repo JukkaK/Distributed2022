@@ -13,8 +13,14 @@ const serviceBusQueueTrigger: AzureFunction = async function(context: Context, m
         url:process.env["DBAPI_URL"],        
         data: {mySbMsg}
         }).then(function (response) {
-            context.log("axios response: ", response);
-            return response
+            context.log("axios response: ", response.status);
+            
+            return {
+                httpResponse: response,
+                outputEvent: context.bindingData.messageId
+            }
+
+            //return response
 
           });    
         

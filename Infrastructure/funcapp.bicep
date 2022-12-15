@@ -25,6 +25,11 @@ param aiKey string
 @secure()
 param serviceBusConnectionString string = ''
 param dbapiUrl string = 'https://func-distributed-dbapi-we-001.azurewebsites.net/api/db'
+@secure()
+param egUri string = ''
+@secure()
+param egKey string = ''
+
 
 //location shortener function
 var shortLocation = {
@@ -127,7 +132,15 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
         {
           name: 'DBAPI_URL'
           value: dbapiUrl
-        }        
+        }
+        {
+          name: 'MyEventGridTopicUriSetting'
+          value: egUri
+        }
+        {
+          name: 'MyEventGridTopicKeySetting'
+          value: egKey
+        }                   
       ]
       ftpsState: 'FtpsOnly'
       minTlsVersion: '1.2'

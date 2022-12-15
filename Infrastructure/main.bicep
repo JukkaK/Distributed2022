@@ -122,6 +122,8 @@ module workerfuncs 'funcapp.bicep' = [for item in locations: {
     aiKey: ai.outputs.aiKey
     appName: 'backend'
     dbapiUrl: 'https://func-distributed-dbapi-${shortLocation[item]}-001.azurewebsites.net/api/db'
+    egUri: eg.outputs.uri
+    egKey: eg.outputs.key
   }
 }]
 

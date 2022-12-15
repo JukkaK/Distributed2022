@@ -6,7 +6,14 @@
       "direction": "in",
       "queueName": "sb-distributed-we-001-front-queue",
       "connection": "serviceBusConnectionString"
-    }
+    },
+    {
+      "type": "eventGrid",
+      "name": "outputEvent",
+      "topicEndpointUri": "MyEventGridTopicUriSetting",
+      "topicKeySetting": "MyEventGridTopicKeySetting",
+      "direction": "out"
+  }
   ],
   "scriptFile": "../dist/ServiceBusQueueTrigger1/index.js"
 }

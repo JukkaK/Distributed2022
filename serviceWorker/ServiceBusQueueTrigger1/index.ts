@@ -5,6 +5,7 @@ const serviceBusQueueTrigger: AzureFunction = async function(context: Context, m
     context.log('ServiceBus queue trigger function processed message', mySbMsg);
     context.log("WEBSITE_SITE_NAME: " + process.env["WEBSITE_SITE_NAME"]); 
     context.log("db api url to call: " + process.env["DBAPI_URL"]);
+    context.log("eg uri: " + process.env["MyEventGridTopicUriSetting"]);
     context.log("DB PUT DATA: ", mySbMsg);
     context.log("Context: ", context);
     context.log("MessageID: ", context.bindingData.messageId);
@@ -15,12 +16,16 @@ const serviceBusQueueTrigger: AzureFunction = async function(context: Context, m
         }).then(function (response) {
             context.log("axios response: ", response.status);
             
-            return {
-                httpResponse: response,
-                outputEvent: context.bindingData.messageId
-            }
+                context.bindings.outputEvent = {
+                    id: 'message-id',
+                    subject: 'subject-name',
+                    dataVersion: '1.0',
+                    eventType: 'event-type',
+                    data: "event-data",                    
+                }
 
-            //return response
+
+            return response
 
           });    
         

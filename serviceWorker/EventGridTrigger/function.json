@@ -4,6 +4,13 @@
       "type": "eventGridTrigger",
       "name": "eventGridEvent",
       "direction": "in"
+    },
+    {
+      "tableName": "state",
+      "connection": "MyStorageConnectionAppSetting",
+      "name": "tableBinding",
+      "type": "table",
+      "direction": "out"
     }
   ],
   "scriptFile": "../dist/EventGridTrigger/index.js"

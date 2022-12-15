@@ -333,6 +333,18 @@ __TODO: Kaikki__
 
 6. The key enablers and the lessons learned during the development of the project.
 
+The project gave a good idea of what distributed systems mean in practice. Although we did not implement the algorithms presented in the course during the project, we felt that we got more benefit by learning to use Azure's PaaS-services.
+
+We learned that services alone do not automatically provide a solution for building a distributed system. However, some things are easier to get done, such as scalability, fault tolerance and recovery. However, this does not mean that things happen automatically. Things must be defined and they must be taken into account in planning. 
+
+Perhaps the most convincing of Azure's services was Cosmos DB and the possibilities it offers for maintaining databases in a distributed manner. It was reassuring to see how consistent the databases were and how quickly they synced. Correspondingly, it was bad that the user was offered only graphical representations of the state of the databases. It would have been more interesting to look at some kind of logs of the events.
+
+For someone who has not used PaaS services offered by Azure or others, it may come as a surprise how much work it actually requires to implement various components and define their functionalities. Another thing that requires time is to implement and plan the transmission of messages between these components in use.
+
+Of course, PaaS services are not for every purpose, but for our style of implementation it is optimal. Due to lack of time, we did not implement the Azure Front Door service. With this, we could also have distributed the front side globally. With the help of this and a few other components, we would have had a really well distributed, consistent and fault-tolerant system.
+
+At the first lecture we were told "Use distribution only when you cannot avoid it". Based on this project, we dare to add to that. If you really have to, find out what kind of possibilities PaaS gives you and whether it is suitable for your purpose.
+
 
 ## Group member participation
 

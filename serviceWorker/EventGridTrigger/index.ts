@@ -4,13 +4,13 @@ const eventGridTrigger: AzureFunction = async function (context: Context, eventG
     context.log(typeof eventGridEvent);
     context.log(eventGridEvent);
 
-    context.bindings.tableBinding = [];
+    // context.bindings.tableBinding = [];
 
-    context.bindings.tableBinding.push({
-        PartitionKey: "Test",
-        RowKey: "1",
-        Name: "Name"
-    });    
+    // context.bindings.tableBinding.push({
+    //     PartitionKey: "Test",
+    //     RowKey: "1",
+    //     Name: "Name"
+    // });    
 
 };
 

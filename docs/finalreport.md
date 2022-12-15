@@ -284,7 +284,9 @@ Here are some fault tolerance figures we found for the services we use in this p
 
 Azure Static Web App, where our frontend runs, is promised 99.95% availability.
 
-Azure Cosmos DB  provide 99.99% availability regardless of the number of regions associated with their database. Azure Cosmos DB automatically mitigates replica outages by guaranteeing at least three replicas of your data in each Azure region for your account within a four replica quorum. 
+Azure Cosmos DB  provide 99.99% availability regardless of the number of regions associated with their database. Azure Cosmos DB automatically mitigates replica outages by guaranteeing at least three replicas of your data in each Azure region for your account within a four replica quorum.
+
+Azure Service Bus is only given the promise that it is highly reliable and it is said that typically, an outage does not cause loss of messages or other data. In Premium service threre is an option to use Availability Zones and it also includes feature where Sevice Bus manages three copies of messaging store (1 primary and 2 secondary).
 
 In Funcntion App there is no built-in redundancy available. How ever to avoid loss of execution during outages, user can redundantly deploy the same functions to function apps in multiple regions. When running the same function code in multiple regions, there are two patterns user can chose from: active/active or active/passive. Our functions are in active/active state so they are all actively running. In order for this to work in the best possible way, Azure Front Door should be implemented. This would coordinate traffic between all areas/functions. We do not use this service, because based on our tests, when one function was stopped, traffic was redirected to another function automatically. 
 

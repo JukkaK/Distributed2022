@@ -21,7 +21,7 @@ const serviceBusQueueTrigger: AzureFunction = async function(context: Context, m
                 subject: 'subject-name',
                 dataVersion: '1.0',
                 eventType: 'event-type',
-                data: "event-data",                
+                data: context.bindingData.messageId,                
             };
                 context.log("sent event");
 

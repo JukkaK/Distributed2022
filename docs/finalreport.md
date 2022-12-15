@@ -47,6 +47,19 @@ Message from frontend to service bus in formatted like this:
 { ean: 2222, name: 'gift two', amount: 2 }
 ```
 
+The frontend retrieves product amount directly from the database or, more precisely, from its API. The request is a standard https call.
+
+```
+export async function getAllProducts() {
+  const response = await fetch('https://func-distributed-dbapi-we-001.azurewebsites.net/api/db', {
+    method: 'GET',
+    headers: {'Content-Type': 'application/json --verbose'},
+    });
+    return await response.json();
+}
+```
+
+
 References:
 
 * React single page app can be found under /front -folder in repo: https://github.com/JukkaK/Distributed2022/tree/main/front.

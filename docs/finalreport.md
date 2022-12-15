@@ -280,6 +280,14 @@ For the purposes of this project, we can assume that our services would survive 
 
 Read more of the basic region/zone design [here](https://learn.microsoft.com/en-us/azure/reliability/availability-zones-overview).
 
+Here are some fault tolerance figures we found for the services we use in this project. These numbers are rather difficult to find and the basis or details are not revealed to the user.
+
+Azure Static Web App, where our frontend runs, is promised 99.95% availability.
+
+Azure Cosmos DB  provide 99.99% availability regardless of the number of regions associated with their database. Azure Cosmos DB automatically mitigates replica outages by guaranteeing at least three replicas of your data in each Azure region for your account within a four replica quorum. 
+
+In Funcntion App there is no built-in redundancy available. How ever to avoid loss of execution during outages, user can redundantly deploy the same functions to function apps in multiple regions. When running the same function code in multiple regions, there are two patterns user can chose from: active/active or active/passive. Our functions are in active/active state so they are all actively running. In order for this to work in the best possible way, Azure Front Door should be implemented. This would coordinate traffic between all areas/functions. We do not use this service, because based on our tests, when one function was stopped, traffic was redirected to another function automatically. 
+
 __TODO: Ville__
 
 - Frontend, service bus, cosmos db+api: just a single instance of these currently deployed. Check from docs on the fault tolerance of those.

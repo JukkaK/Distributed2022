@@ -195,7 +195,21 @@ We use Azure Application Insights as to log and debug our function apps. Every f
 
 ### Infrastructure-as-code
 
-The IAC implementation is in __/Infrastucture__ -folder. It does not cover the whole solution (the static web app has been created via portal, as there tend to be some challenges with the application deployment if the resource is created with IAC, and also some additional log forwarding to cosmos db and service bus has been done manually). While the infra implementation is mostly out of the scope for the project, it is included in the repository as it's easier to illustrate the node discovery configuration in the code.
+The IAC implementation is in __/Infrastucture__ -folder. It does not cover the whole solution (the static web app has been created via portal, as there tend to be some challenges with the application deployment if the resource is created with IAC, and also some additional log forwarding to cosmos db and service bus has been done manually).
+
+```bash
+Infrastructure\
+|---ai.bicep
+|---cosmosdb.bicep
+|---eventgrid.bicep
+|---funcapp.bicep
+|---funcappsbd.bicep
+|---law.bicep
+|---main.bicep
+|---servicebus.bicep
+```
+
+While the infra implementation is mostly out of the scope for the project, it is included in the repository as it's easier to illustrate the node discovery configuration in the code.
 
 The IAC code has been deployed via AZ CLI command line interface, so after logging in and setting the deployment context (ie. Azure subscription), deployment has been run with command in the Infrastructure folder:
 

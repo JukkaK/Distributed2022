@@ -11,12 +11,18 @@ const serviceBusQueueTrigger: AzureFunction = async function(context: Context, m
     context.log("Context: ", context);
     context.log("MessageID: ", context.bindingData.messageId);
 
+    console.log("-----------start search--------------")
+
     const tableClient = TableClient.fromConnectionString(process.env.AzureWebJobsStorage, "state");
+    console.log("Client value:", tableClient)
+
     let result = await tableClient.getEntity("state", context.bindingData.messageId)
         .catch((error) => {
             console.log("error", error);
         });
     console.log("Result: ", result)
+
+    console.log("-----------stop search--------------")
 
     await axios({
         method: 'PUT',

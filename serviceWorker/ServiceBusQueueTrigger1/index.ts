@@ -16,7 +16,7 @@ const serviceBusQueueTrigger: AzureFunction = async function(context: Context, m
     const tableClient = TableClient.fromConnectionString(process.env.AzureWebJobsStorage, "state");
     console.log("Client value:", tableClient)
 
-    let result = await tableClient.getEntity("state", "52318b1c10e742048c277903a2807bb0")
+    let result = await tableClient.getEntity("state", "0139dd36c5d144d38c8f9ef7909d8d20")
         .catch((error) => {
             console.log("error", error);
         });

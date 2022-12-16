@@ -11,20 +11,16 @@ const serviceBusQueueTrigger: AzureFunction = async function(context: Context, m
     context.log("Context: ", context);
     context.log("MessageID: ", context.bindingData.messageId);
 
-    console.log("-----------start search--------------")
-
+    //Search the Table if the update already exists
     const tableClient = TableClient.fromConnectionString(process.env.AzureWebJobsStorage, "state");
     let result = await tableClient.getEntity("state", context.bindingData.messageId)
         .catch((error) => {
-            console.log("error", error);
+            console.log("no match found");
         });
-    console.log("Result: ", result)
+
     if (result) {
         return "item exists"
     }
-    
-
-    console.log("-----------stop search--------------")
 
     await axios({
         method: 'PUT',

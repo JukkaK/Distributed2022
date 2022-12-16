@@ -14,12 +14,15 @@ const serviceBusQueueTrigger: AzureFunction = async function(context: Context, m
     console.log("-----------start search--------------")
 
     const tableClient = TableClient.fromConnectionString(process.env.AzureWebJobsStorage, "state");
-    
-     let result = await tableClient.getEntity("state", "379e71dc7f8649d3b837a01b2ac3814a")
+    let result = await tableClient.getEntity("state", context.bindingData.messageId)
         .catch((error) => {
             console.log("error", error);
         });
     console.log("Result: ", result)
+    if (result) {
+        return "item exists"
+    }
+    
 
     console.log("-----------stop search--------------")
 

@@ -15,15 +15,12 @@ const serviceBusQueueTrigger: AzureFunction = async function(context: Context, m
 
     const tableClient = TableClient.fromConnectionString(process.env.AzureWebJobsStorage, "state");
     console.log("Client value:", tableClient)
-    //await tableClient.getEntity("state", "0139dd36c5d144d38c8f9ef7909d8d20")
-    let result = tableClient.listEntities();
-    for await (const entity of result) {
-        console.log("entity:", entity);
-      }
-    //    .catch((error) => {
-    //        console.log("error", error);
-    //    });
-    //console.log("Result: ", result)
+    //await tableClient.getEntity("state", '"0139dd36c5d144d38c8f9ef7909d8d20"')
+    let result = await tableClient.getEntity("state", '"0139dd36c5d144d38c8f9ef7909d8d20"')
+        .catch((error) => {
+            console.log("error", error);
+        });
+    console.log("Result: ", result)
 
     console.log("-----------stop search--------------")
 

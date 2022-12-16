@@ -1,5 +1,6 @@
 import { AzureFunction, Context } from "@azure/functions"
 import axios from 'axios';
+import { TableClient } from '@azure/data-tables';
 
 const serviceBusQueueTrigger: AzureFunction = async function(context: Context, mySbMsg: any): Promise<Object> {
     context.log('ServiceBus queue trigger function processed message', mySbMsg);
@@ -9,7 +10,15 @@ const serviceBusQueueTrigger: AzureFunction = async function(context: Context, m
     context.log("DB PUT DATA: ", mySbMsg);
     context.log("Context: ", context);
     context.log("MessageID: ", context.bindingData.messageId);
-        await axios({
+
+    const tableClient = TableClient.fromConnectionString(process.env.AzureWebJobsStorage, "state");
+    let result = await tableClient.getEntity("state", context.bindingData.messageId)
+        .catch((error) => {
+            console.log("error", error);
+        });
+    console.log("Result: ", result)
+
+    await axios({
         method: 'PUT',
         url:process.env["DBAPI_URL"],        
         data: {mySbMsg}
@@ -29,7 +38,7 @@ const serviceBusQueueTrigger: AzureFunction = async function(context: Context, m
 
           });    
         
-          return "nope"  
+        return "nope"  
     }
     
     

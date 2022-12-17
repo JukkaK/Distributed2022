@@ -13,7 +13,6 @@ const eventGridTrigger: AzureFunction = async function (context: Context, eventG
 
     const entity = {
         partitionKey: "p1",
-        //rowKey: uuidv4(),
         rowKey: eventGridEvent.data,
         date: new Date()
       };

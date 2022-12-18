@@ -1,7 +1,15 @@
 
-# Distributed Systems 2022
+# Distributed Systems 2022 - Team Azure
 
-Some basic info about the project (insert here).
+Quick summary of the repo:
+
+/Infrastructure - IAC code made with Azure bicep. Start from main.bicep.
+/front - React Single Page App.
+/api - Backend API for the React App.
+/serviceWorker - distributed node with two functions.
+/dbApi - MongoDB API that calls Cosmos DB.
+/.github - GitHub Actions for app deployment.
+/docs - original markdowns (not really uptodate), final docx.
 
 ## Members (with knowledge areas listed)
 

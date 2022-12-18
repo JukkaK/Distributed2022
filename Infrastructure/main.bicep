@@ -1,20 +1,16 @@
+//This is the entrypoint file for IAC deployment. All other bicep-files are modules referenced by this template.
 @description('Location for resources. Default is West Europe.')
 param location string = 'westeurope'
 param buildtag string = utcNow()
-//location shortener function
-// var shortLocation = {
-//   'westeurope': 'we'
-//   'northeurope': 'ne'
-//   'eastus': 'eus'
-// }[location]
 
-//location shortener function
+//location shortener function for naming.
 var shortLocation = {
   westeurope: 'we'
   northeurope: 'ne'
   eastus: 'eus'
 }
 
+//DB hints
 var dblocation = {
   westeurope: 'West Europe'
   northeurope: 'North Europe'
@@ -29,12 +25,14 @@ var dbName = 'cosmos-${projectName}-we-001'
 var sbName = 'sb-${projectName}-${shortLocation[location]}-001'
 var egTopicName = 'evgt-${projectName}-${shortLocation[location]}-001'
 
+//These are the regions we currenctly deploy to.
 var locations = [
   'westeurope'
   'northeurope'
   'eastus'
 ]
 
+//Resource groups where the resources are created.
 resource messageRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: 'rg-${projectName}-message-${shortLocation[location]}-001'
   location: location
@@ -50,31 +48,17 @@ resource dataRg2 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   location: location
 }
 
-// resource backendWeRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-//   name: 'rg-${projectName}-backend-we-001'
-//   location: location
-// }
-
 resource backendRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: 'rg-${projectName}-backend-001'
   location: location
 }
-
-// resource backendNeRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-//   name: 'rg-${projectName}-backend-ne-001'
-//   location: 'northeurope'
-// }
-
-// resource backendEusRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-//   name: 'rg-${projectName}-backend-eus-001'
-//   location: 'eastus'
-// }
 
 resource messageRg2 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: 'rg-${projectName}-message-${shortLocation[location]}-002'
   location: location
 }
 
+//CosmosDB module. 
 module cosmosdb 'cosmosdb.bicep' = {
   scope: dataRg2
   name: '${dbName}-${buildtag}'
@@ -85,33 +69,14 @@ module cosmosdb 'cosmosdb.bicep' = {
   }
 }
 
+//Application Insights
 module ai 'ai.bicep' = {
   scope: backendRg
   name: 'ai-${buildtag}'
 }
 
-// module dbapi 'funcapp.bicep' = {
-//   scope: dataRg
-//   name: 'dbapi'
-//   params: {
-//     location: location
-//     cosmoscs: cosmosdb.outputs.cs
-//     aiKey: ai.outputs.aiKey
-//     appName: 'dbapi'   
-//   }
-// }
-
-// module dbapifuncs 'funcapp.bicep' = [for item in locations: {
-//   scope: dataRg2
-//   name: 'dbapi-${item}'
-//   params: {
-//     location: item
-//     cosmoscs: cosmosdb.outputs.cs
-//     aiKey: ai.outputs.aiKey
-//     appName: 'dbapi-${item}' 
-//   }
-// }]
-
+//Loop through locations and create a serviceWorker function app to every location. Takes in connection strings
+//and other items needed for configuration.
 module workerfuncs 'funcapp.bicep' = [for item in locations: {
   scope: backendRg
   name: 'serviceWorker-${item}'
@@ -127,6 +92,7 @@ module workerfuncs 'funcapp.bicep' = [for item in locations: {
   }
 }]
 
+//Loop through locations and create a dbApi function app to every location.
 module dbfuncs 'funcappsdb.bicep' = [for item in locations: {
   scope: dataRg2
   name: 'dbApi-${item}'
@@ -138,40 +104,7 @@ module dbfuncs 'funcappsdb.bicep' = [for item in locations: {
   }
 }]
 
-// module workersWE 'funcapp.bicep' = {
-//   scope: backendWeRg
-//   name: 'backendWe'
-//   params: {
-//     location: 'westeurope'
-//     cosmoscs: cosmosdb.outputs.cs
-//     serviceBusConnectionString: servicebus.outputs.serviceBusConnectionString
-//     aiKey: ai.outputs.aiKey
-//     appName: 'backend'   
-//   }
-// }
-// module workersNE 'funcapp.bicep' = {
-//   scope: backendNeRg
-//   name: 'backendNe'
-//   params: {
-//     location: 'northeurope'
-//     cosmoscs: cosmosdb.outputs.cs
-//     serviceBusConnectionString: servicebus.outputs.serviceBusConnectionString
-//     aiKey: ai.outputs.aiKey
-//     appName: 'backend'   
-//   }
-// }
-
-// module workersEus 'funcapp.bicep' = {
-//   scope: backendEusRg
-//   name: 'backendEus'
-//   params: {
-//     location: 'eastus'
-//     cosmoscs: cosmosdb.outputs.cs
-//     serviceBusConnectionString: servicebus.outputs.serviceBusConnectionString
-//     aiKey: ai.outputs.aiKey
-//     appName: 'backend'   
-//   }
-// }
+//Service Bus 
 module servicebus 'servicebus.bicep' = {
   scope: messageRg2
   name: '${sbName}-${buildtag}'
@@ -182,6 +115,7 @@ module servicebus 'servicebus.bicep' = {
   }
 }
 
+//Log analytics workspace. Some services ship logs to this resource.
 module law 'law.bicep' = {
   scope: backendRg
   name: 'lawWe'
@@ -190,6 +124,7 @@ module law 'law.bicep' = {
   }
 }
 
+//Event Grid. Note that event grid subscriptions have been created manually after deploying the IAC.
 module eg 'eventgrid.bicep' = {
   scope: messageRg
   name: '${egTopicName}-${buildtag}'

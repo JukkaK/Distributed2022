@@ -1,5 +1,8 @@
 import { Schema, model, connect } from "mongoose";
 
+//This library implementes calls to CosmosDB instances. It fetches connection string from Func App configuration (created with IAC-code).
+//The connection string has a hint on which CosmosDB instance this function should primarily direct it's operations to.
+
 let db=null;
 
 const itemSchema = new Schema(

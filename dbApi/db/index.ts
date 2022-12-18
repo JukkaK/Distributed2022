@@ -1,6 +1,9 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
 import * as db from "../lib/azure-cosmosdb-mongodb";
 
+//This the function responsible for handling DB operations. It has an inbound http trigger in the function.json.
+//Operation implementation is in the lib-folder.
+
 const httpTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest
@@ -14,6 +17,7 @@ const httpTrigger: AzureFunction = async function (
 
     switch (req.method) {
       case "GET":
+          //Frontend calls directly this method and updates itself.
           // allows empty query to return all items
           const dbQuery =
             req?.query?.dbQuery || (req?.body && req?.body?.dbQuery);
@@ -23,6 +27,7 @@ const httpTrigger: AzureFunction = async function (
         
         break;
       case "POST":
+        //Not currently used.
         if (req?.body?.document) {
           const insertOneResponse = await db.addItem(req?.body?.document);
           response = {
@@ -34,6 +39,7 @@ const httpTrigger: AzureFunction = async function (
 
         break;
       case "DELETE":
+        //Not used, but would be handy!
         if (req?.query?.id || (req?.body && req?.body?.id)) {
           response = {
             documentResponse: await db.deleteItemById(req?.body?.id),
@@ -44,6 +50,7 @@ const httpTrigger: AzureFunction = async function (
 
         break;
       case "PUT":
+        //Update database
         context.log("Entering DB PUT with");
         if (req.body.mySbMsg.amount) {
             context.log("Updating with amount:" + req.body.mySbMsg.amount);

@@ -2,6 +2,9 @@ import { AzureFunction, Context } from "@azure/functions"
 import axios from 'axios';
 import { TableClient } from '@azure/data-tables';
 
+//This the function that consumes messages from service bus. There is an inbound binding for service bus and outbound binding
+//for Event Grid in the function.json.
+
 const serviceBusQueueTrigger: AzureFunction = async function(context: Context, mySbMsg: any): Promise<Object> {
     context.log('ServiceBus queue trigger function processed message', mySbMsg);
     context.log("WEBSITE_SITE_NAME: " + process.env["WEBSITE_SITE_NAME"]); 
@@ -22,6 +25,7 @@ const serviceBusQueueTrigger: AzureFunction = async function(context: Context, m
         return "item exists"
     }
 
+    //Start the database update by calling dbApi with url fetched from Function App Configuration (which is created with IAC-code).
     await axios({
         method: 'PUT',
         url:process.env["DBAPI_URL"],        
@@ -29,6 +33,7 @@ const serviceBusQueueTrigger: AzureFunction = async function(context: Context, m
         }).then(function (response) {
             context.log("axios response: ", response.status);
                 
+            //Construct an event with service bus messageid as payload, and send it to Event Grid Topic via the output binding.
             context.bindings.outputEvent = {
                 id: 'message-id',
                 subject: 'subject-name',

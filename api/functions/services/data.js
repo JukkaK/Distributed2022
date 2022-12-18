@@ -1,3 +1,4 @@
+//Initial test data for the front end. Not used anymore.
 const data = {
     items: [
       {

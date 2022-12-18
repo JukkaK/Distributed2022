@@ -1,5 +1,5 @@
 const data = require('./data.js');
-
+//Initial code for frontend development. Not used anymore.
 module.exports = {
     getItems: function(context) {
         try {

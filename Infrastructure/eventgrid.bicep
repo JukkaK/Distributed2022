@@ -14,4 +14,5 @@ resource eg 'Microsoft.EventGrid/topics@2022-06-15' = {
 var egEndpoint = '${eg.id}/Topics'
 
 output uri string = eg.properties.endpoint
+//Note: do not do this in real life. Rather put secrets to Azure Keyvault.
 output key string = eg.listKeys().key1

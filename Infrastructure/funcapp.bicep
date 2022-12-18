@@ -43,6 +43,7 @@ var functionAppName = 'func-distributed-${appName}-${shortLocation}-001'
 var storageAccountName = 'stgdist${appName}${shortLocation}002'
 var functionWorkerRuntime = runtime
 
+//Storage account gets created here.
 resource storage 'Microsoft.Storage/storageAccounts@2021-08-01' = {
   name: storageAccountName
   location: location
@@ -53,6 +54,7 @@ resource storage 'Microsoft.Storage/storageAccounts@2021-08-01' = {
   properties: {}
 }
 
+//Add table to storage account.
 resource tables 'Microsoft.Storage/storageAccounts/tableServices@2021-09-01' = {
   name: 'default'
   parent: storageAccount
@@ -91,6 +93,7 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
   }
   properties: {
     serverFarmId: hostingPlan.id
+    //These are the func app configurations. Azure Func Apps are always configured with storage account.
     siteConfig: {
       appSettings: [
         {
@@ -113,6 +116,7 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
           name: 'WEBSITE_NODE_DEFAULT_VERSION'
           value: '~14'
         }
+        //Here we link func app to application insights.
         {
           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
           value: aiKey

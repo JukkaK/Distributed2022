@@ -61,6 +61,7 @@ resource database 'Microsoft.DocumentDB/databaseAccounts/mongodbDatabases@2022-0
   }
 }
 
+//This nosql collection is not really used anywhere; test data has been craeted manually after deploying the IAC-code.
 resource collection1 'Microsoft.DocumentDb/databaseAccounts/mongodbDatabases/collections@2022-05-15' = {
   parent: database
   name: collection1Name
@@ -97,14 +98,6 @@ resource collection1 'Microsoft.DocumentDb/databaseAccounts/mongodbDatabases/col
     }
   }
 }
-
-// resource cosmosDB_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-//   name: '${cosmosDBAccountName}-law'
-//   properties: {
-//     workspaceId: lawId
-//   }
-//   scope: cosmosDbAccount
-// }
 
 //Do not do this in real life, just in course projects like this.
 output cs string = listConnectionStrings(resourceId('Microsoft.DocumentDB/databaseAccounts', cosmosDBAccountName), '2022-05-15').connectionStrings[0].connectionString

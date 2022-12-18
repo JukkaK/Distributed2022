@@ -6,7 +6,7 @@ export async function getAllProducts() {
     return await response.json();
 }
 
-/* for local testing
+/* for local testing change getAllProducts to this
   const response = await fetch('/api/stock');
     return await response.json();
   }

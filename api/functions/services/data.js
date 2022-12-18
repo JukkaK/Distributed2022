@@ -1,5 +1,5 @@
 const data = {
-    todos: [
+    items: [
       {
         id: 1,
         ean: 1111,
@@ -25,23 +25,23 @@ const data = {
   };
 
   module.exports = {
-    getToDos: function() {
-        return data.todos;
+    getITems: function() {
+        return data.items;
     },
-    editTodos: function(task) {
-        data.todos = data.todos.map(todo => {
-            if (todo.ean == task.ean) todo.amount = (todo.amount - task.amount);
+    editItems: function(task) {
+        data.items = data.items.map(item => {
+            if (item.ean == task.ean) item.amount = (item.amount - task.amount);
             return {
-              id: todo.id,
-              ean: todo.ean,
-              pic: todo.pic,
-              name: todo.name,
-              amount: todo.amount
+              id: item.id,
+              ean: item.ean,
+              pic: item.pic,
+              name: item.name,
+              amount: item.amount
           }
         });
         return {
-            message: "task edited",
-            tasks: data.todos
+            message: "items edited",
+            tasks: data.items
         }
     }
   }

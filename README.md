@@ -3,17 +3,17 @@
 
 Quick summary of the repo:
 
-/Infrastructure - IAC code made with Azure bicep. Start from main.bicep.
-/front - React Single Page App.
-/api - Backend API for the React App.
-/serviceWorker - distributed node with two functions.
-/dbApi - MongoDB API that calls Cosmos DB.
-/.github - GitHub Actions for app deployment.
-/docs - original markdowns (not really uptodate), final docx.
+/Infrastructure - IAC code made with Azure bicep. Start from main.bicep.<br>
+/front - React Single Page App.<br>
+/api - Backend API for the React App.<br>
+/serviceWorker - distributed node with two functions.<br>
+/dbApi - MongoDB API that calls Cosmos DB.<br>
+/.github - GitHub Actions for app deployment.<br>
+/docs - original markdowns (not really uptodate), final docx.<br>
 
 ## Members (with knowledge areas listed)
 
-- Jukka (Azure, Architecture, DevOpsy-stuff - not really a programmer as such, but I'll learn whatever the other choose to implement with)
+- Jukka (Azure, Architecture, DevOpsy-stuff)
 - Jari (Node.js, React)
 - Ville (Node.js)
 
